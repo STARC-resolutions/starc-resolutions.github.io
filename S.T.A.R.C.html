@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARC RESOLUTIONS | Command Center</title>
+    <style>
+        :root {
+            --stark-blue: #00d4ff;
+            --deep-bg: #050505;
+            --glass-bg: rgba(20, 20, 20, 0.8);
+            --border-glow: rgba(0, 212, 255, 0.3);
+        }
+
+        body {
+            background: var(--deep-bg);
+            color: #ffffff;
+            font-family: 'Orbitron', 'Segoe UI', sans-serif; /* High-tech font feel */
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Scanline effect for that "Monitor" look */
+        body::before {
+            content: " ";
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        header {
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--border-glow);
+            background: radial-gradient(circle at center, #111 0%, #050505 100%);
+        }
+
+        h1 {
+            font-size: 3rem;
+            letter-spacing: 12px;
+            color: var(--stark-blue);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .status-bar {
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: -50px auto 50px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid #222;
+            padding: 30px;
+            border-radius: 2px; /* Sharp edges for a military/tech look */
+            position: relative;
+            transition: 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            border-color: var(--stark-blue);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--stark-blue);
+            border-left: 2px solid var(--stark-blue);
+        }
+
+        .tag {
+            color: var(--stark-blue);
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        h3 { margin: 10px 0; font-weight: 400; letter-spacing: 1px; }
+
+        p { color: #aaa; line-height: 1.6; font-size: 0.95rem; }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid var(--stark-blue);
+            color: var(--stark-blue);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--stark-blue);
+            color: #000;
+        }
+
+        footer {
+            text-align: center;
+            padding: 50px;
+            font-size: 10px;
+            color: #333;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>S.T.A.R.C RESOLUTIONS</h1>
+    <div class="status-bar">Systems: Online | Database: Indexed | Phase: 01 Deployment</div>
+</header>
+
+<div class="container">
+    <div class="grid">
+        
+        <div class="card">
+            <span class="tag">Security Pillar</span>
+            <h3>SHIELD: AI-IDS Engine</h3>
+            <p>Neural network based intrusion detection. Optimized for zero-day threat recognition and academic research submission.</p>
+            <a href="https://github.com/STARC-resolutions/starc-shield-ai" class="btn">ACCESS REPOSITORY</a>
+        </div>
+
+        <div class="card">
+            <span class="tag">Data Pillar</span>
+            <h3>MARKET-GAP ANALYZER</h3>
+            <p>Predictive analytics engine for e-commerce arbitrage. Deploying Phase 02 Data Science protocols.</p>
+            <span style="color:#444; font-size: 11px;">[LOCKED - INITIALIZING]</span>
+        </div>
+
+        <div class="card">
+            <span class="tag">Academic Pillar</span>
+            <h3>IEEE BLUEPRINT FACTORY</h3>
+            <p>Automated generation of IEEE-standard research abstracts and system architecture documentation.</p>
+            <span style="color:#444; font-size: 11px;">[LOCKED - INITIALIZING]</span>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 S.T.A.R.C. RESOLUTIONS // PUNE_HQ // ALL RIGHTS RESERVED
+</footer>
+
+</body>
+</html>
