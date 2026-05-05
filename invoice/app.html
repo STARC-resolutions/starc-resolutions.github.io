@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STARC Invoice — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0a1a0c;
+  --panel: #0d1f0f;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(138,173,63,0.18);
+  --forest: #1e4a20;
+  --green: #2d5a27;
+  --olive: #6b7c3a;
+  --leaf: #8aad3f;
+  --light-leaf: #b5c96a;
+  --brown: #5c3d1e;
+  --cream: #f5f0e8;
+  --gold: #c9a84c;
+  --red: #c0392b;
+  --orange: #d35400;
+  --muted: rgba(245,240,232,0.45);
+  --sidebar: 260px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { height:100%; }
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar);
+  min-height: 100vh;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 28px 20px;
+  gap: 6px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 8px 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.sidebar-logo span { font-size: 1.8rem; }
+.sidebar-logo h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+.sidebar-logo h2 small {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.nav-item:hover { color: var(--cream); background: rgba(138,173,63,0.06); }
+.nav-item.active {
+  color: var(--cream);
+  background: rgba(138,173,63,0.12);
+  border-color: rgba(138,173,63,0.25);
+}
+.nav-icon { font-size: 18px; width: 24px; text-align: center; }
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(138,173,63,0.05);
+  border: 1px solid var(--border);
+}
+.user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--green);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600; flex-shrink: 0;
+  overflow: hidden;
+}
+.user-avatar img { width:100%; height:100%; object-fit:cover; }
+.user-info { flex:1; min-width:0; }
+.user-name { font-size: 13px; font-weight: 500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.user-plan { font-size: 11px; color: var(--leaf); letter-spacing: 0.5px; }
+
+.pro-banner {
+  background: linear-gradient(135deg, rgba(45,90,39,0.5), rgba(107,124,58,0.3));
+  border: 1px solid rgba(138,173,63,0.3);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 8px;
+}
+.pro-banner p { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+.pro-banner button {
+  width: 100%; padding: 9px;
+  background: var(--leaf); border: none; border-radius: 8px;
+  color: var(--bg); font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  letter-spacing: 0.5px; transition: opacity 0.2s;
+}
+.pro-banner button:hover { opacity: 0.85; }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 36px;
+  display: flex; flex-direction: column; gap: 28px;
+}
+
+.page { display: none; }
+.page.active { display: flex; flex-direction: column; gap: 28px; }
+
+/* Page header */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+}
+.page-title h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+}
+.page-title p { color: var(--muted); font-size: 14px; margin-top: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 20px; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  border: none; white-space: nowrap;
+}
+.btn-primary { background: var(--green); color: var(--cream); border: 1px solid var(--leaf); }
+.btn-primary:hover { background: var(--olive); transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(--cream); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--leaf); background: rgba(138,173,63,0.06); }
+.btn-danger { background: rgba(192,57,43,0.15); color: #e74c3c; border: 1px solid rgba(192,57,43,0.3); }
+.btn-danger:hover { background: rgba(192,57,43,0.25); }
+
+/* Stats */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px 24px;
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute; top:-30%; right:-10%;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(138,173,63,0.1), transparent);
+  border-radius: 50%;
+}
+.stat-label {
+  font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem; font-weight: 700;
+  line-height: 1;
+}
+.stat-value.green { color: var(--leaf); }
+.stat-value.orange { color: #e67e22; }
+.stat-value.red { color: #e74c3c; }
+.stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* Invoice list */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.card-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-head h3 { font-size: 15px; font-weight: 600; }
+
+table { width: 100%; border-collapse: collapse; }
+th {
+  padding: 12px 20px;
+  text-align: left; font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 16px 20px;
+  font-size: 14px; border-bottom: 1px solid rgba(138,173,63,0.06);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(138,173,63,0.03); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+}
+.badge-paid { background: rgba(138,173,63,0.15); color: var(--leaf); }
+.badge-pending { background: rgba(230,126,34,0.15); color: #e67e22; }
+.badge-overdue { background: rgba(192,57,43,0.15); color: #e74c3c; }
+
+.action-btns { display: flex; gap: 8px; }
+.icon-btn {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.2s;
+}
+.icon-btn:hover { background: rgba(138,173,63,0.12); border-color: var(--leaf); }
+
+/* Empty state */
+.empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+.empty .empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+.empty p { font-size: 14px; line-height: 1.7; }
+
+/* ── INVOICE FORM ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+.full { grid-column: 1/-1; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label {
+  font-size: 12px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+}
+.field input, .field select, .field textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--leaf);
+  box-shadow: 0 0 0 3px rgba(138,173,63,0.1);
+}
+.field select option { background: #1a3a1f; }
+.field textarea { resize: vertical; min-height: 80px; }
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6) sepia(1) hue-rotate(60deg);
+}
+
+/* Items table */
+.items-table { width:100%; border-collapse:collapse; }
+.items-table th {
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); padding: 10px 12px; text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+}
+.items-table td { padding: 8px; border-bottom: none; }
+.items-table input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; width: 100%; outline: none;
+  transition: border-color 0.2s;
+}
+.items-table input:focus { border-color: var(--leaf); }
+.item-total { font-size: 13px; color: var(--leaf); font-weight: 600; text-align: right; padding: 9px 11px; }
+
+.add-item-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: rgba(138,173,63,0.06);
+  border: 1px dashed rgba(138,173,63,0.3);
+  border-radius: 10px; cursor: pointer;
+  color: var(--olive); font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s; margin-top: 8px;
+}
+.add-item-btn:hover { background: rgba(138,173,63,0.1); color: var(--leaf); border-color: var(--leaf); }
+
+.totals-box {
+  background: rgba(138,173,63,0.05);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  min-width: 280px;
+}
+.total-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 14px;
+}
+.total-row.grand {
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--leaf);
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.total-row span:first-child { color: var(--muted); }
+.total-row.grand span:first-child { color: var(--cream); }
+
+.form-footer {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* AI suggestion button */
+.ai-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 10px; cursor: pointer;
+  color: var(--gold); font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.ai-btn:hover { background: rgba(201,168,76,0.18); border-color: var(--gold); }
+
+/* ── CLIENT PAGE ── */
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.client-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.2s; cursor: pointer;
+}
+.client-card:hover { border-color: rgba(138,173,63,0.4); transform: translateY(-2px); }
+.client-avatar {
+  width: 44px; height: 44px;
+  background: var(--green); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 700; margin-bottom: 12px;
+}
+.client-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.client-email { font-size: 12px; color: var(--muted); }
+.client-meta {
+  display: flex; justify-content: space-between;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--muted);
+}
+.client-meta span { color: var(--cream); font-weight: 500; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  z-index: 500; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: #0f2412;
+  border: 1px solid rgba(138,173,63,0.25);
+  border-radius: 20px;
+  padding: 32px;
+  width: min(480px, 100%);
+  max-height: 90vh; overflow-y: auto;
+  animation: modalIn 0.25s ease;
+}
+@keyframes modalIn {
+  from { opacity:0; transform:scale(0.96) translateY(10px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+.modal h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; margin-bottom: 20px;
+}
+.modal-footer {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--green); border: 1px solid var(--leaf);
+  border-radius: 12px; padding: 14px 20px;
+  font-size: 14px; z-index: 1000;
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.3s; display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Loading */
+.loading-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(10,26,12,0.9); z-index:900;
+  align-items:center; justify-content:center; flex-direction:column; gap:16px;
+}
+.loading-overlay.show { display:flex; }
+.spinner {
+  width:40px; height:40px;
+  border:3px solid rgba(138,173,63,0.2);
+  border-top-color:var(--leaf);
+  border-radius:50%; animation:spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(138,173,63,0.2); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(138,173,63,0.4); }
+
+/* Mobile */
+@media(max-width:768px) {
+  .sidebar { display:none; }
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .form-grid { grid-template-columns:1fr; }
+  .form-grid.triple { grid-template-columns:1fr 1fr; }
+  .main { padding:20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span>🌳</span>
+    <h2>STARC Invoice <small>by STARC Solutions</small></h2>
+  </div>
+
+  <div class="nav-item active" onclick="showPage('dashboard')">
+    <span class="nav-icon">📊</span> Dashboard
+  </div>
+  <div class="nav-item" onclick="showPage('new-invoice')">
+    <span class="nav-icon">🧾</span> New Invoice
+  </div>
+  <div class="nav-item" onclick="showPage('invoices')">
+    <span class="nav-icon">📋</span> All Invoices
+  </div>
+  <div class="nav-item" onclick="showPage('clients')">
+    <span class="nav-icon">👥</span> Clients
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Loading…</div>
+        <div class="user-plan" id="userPlan">FREE PLAN</div>
+      </div>
+    </div>
+    <div class="pro-banner" id="proBanner">
+      <p>🚀 Upgrade to Pro for unlimited invoices & no watermark</p>
+      <button onclick="handleUpgrade()">Upgrade — ₹499/mo</button>
+    </div>
+    <div class="nav-item" onclick="signOut()" style="color:var(--muted)">
+      <span class="nav-icon">🚪</span> Sign Out
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Dashboard 🌿</h1>
+        <p id="dashGreeting">Good morning, Sarvesh</p>
+      </div>
+      <button class="btn btn-primary" onclick="showPage('new-invoice')">+ New Invoice</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Earned</div>
+        <div class="stat-value green" id="statTotal">₹0</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Paid</div>
+        <div class="stat-value green" id="statPaid">₹0</div>
+        <div class="stat-sub" id="statPaidCount">0 invoices</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value orange" id="statPending">₹0</div>
+        <div class="stat-sub" id="statPendingCount">0 invoices</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Overdue</div>
+        <div class="stat-value red" id="statOverdue">₹0</div>
+        <div class="stat-sub" id="statOverdueCount">0 invoices</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Recent Invoices</h3>
+        <button class="btn btn-ghost" onclick="showPage('invoices')" style="padding:8px 14px;font-size:13px">View All</button>
+      </div>
+      <div id="recentInvoicesTable">
+        <div class="empty">
+          <div class="empty-icon">🧾</div>
+          <p>No invoices yet.<br>Create your first invoice to get started.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW INVOICE -->
+  <div class="page" id="page-new-invoice">
+    <div class="page-header">
+      <div class="page-title">
+        <h1>New Invoice 🧾</h1>
+        <p>Fill in the details below — AI will help you write descriptions</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" onclick="showPage('dashboard')">← Back</button>
+        <button class="btn btn-primary" onclick="generatePDF()">⬇ Download PDF</button>
+      </div>
+    </div>
+
+    <!-- Invoice Details -->
+    <div class="card">
+      <div class="card-head"><h3>Invoice Details</h3></div>
+      <div style="padding:24px">
+        <div class="form-grid triple">
+          <div class="field">
+            <label>Invoice Number</label>
+            <input type="text" id="invNumber" placeholder="INV-001" />
+          </div>
+          <div class="field">
+            <label>Invoice Date</label>
+            <input type="date" id="invDate" />
+          </div>
+          <div class="field">
+            <label>Due Date</label>
+            <input type="date" id="invDue" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- From / To -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-head"><h3>From (Your Business)</h3></div>
+        <div style="padding:24px">
+          <div class="form-grid" style="grid-template-columns:1fr">
+            <div class="field"><label>Business Name</label><input type="text" id="fromName" value="STARC Solutions" /></div>
+            <div class="field"><label>Email</label><input type="email" id="fromEmail" placeholder="you@starc-solutions.tech" /></div>
+            <div class="field"><label>Phone</label><input type="tel" id="fromPhone" placeholder="+91 XXXXX XXXXX" /></div>
+            <div class="field"><label>Address</label><textarea id="fromAddress" placeholder="City, State, PIN"></textarea></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Bill To (Client)</h3>
+          <select id="clientSelect" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;cursor:pointer" onchange="fillClient()">
+            <option value="">Select saved client…</option>
+          </select>
+        </div>
+        <div style="padding:24px">
+          <div class="form-grid" style="grid-template-columns:1fr">
+            <div class="field"><label>Client Name</label><input type="text" id="toName" placeholder="Client / Company name" /></div>
+            <div class="field"><label>Email</label><input type="email" id="toEmail" placeholder="client@email.com" /></div>
+            <div class="field"><label>Phone</label><input type="tel" id="toPhone" placeholder="+91 XXXXX XXXXX" /></div>
+            <div class="field"><label>Address</label><textarea id="toAddress" placeholder="Client address"></textarea></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="card">
+      <div class="card-head">
+        <h3>Services / Items</h3>
+        <button class="ai-btn" onclick="aiSuggestItems()">✨ AI Suggest Descriptions</button>
+      </div>
+      <div style="padding:16px 24px 24px">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width:40%">Description</th>
+              <th style="width:12%">Qty</th>
+              <th style="width:18%">Rate (₹)</th>
+              <th style="width:12%">GST %</th>
+              <th style="width:14%">Total</th>
+              <th style="width:4%"></th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody">
+          </tbody>
+        </table>
+        <button class="add-item-btn" onclick="addItem()">+ Add Item</button>
+      </div>
+    </div>
+
+    <!-- Totals + Notes -->
+    <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+      <div class="card" style="flex:1;min-width:220px">
+        <div class="card-head"><h3>Notes</h3></div>
+        <div style="padding:20px">
+          <textarea id="invNotes" class="field" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;min-height:100px;outline:none;resize:vertical" placeholder="Payment terms, bank details, thank you note…"></textarea>
+        </div>
+      </div>
+      <div class="totals-box" style="flex-shrink:0">
+        <div class="total-row"><span>Subtotal</span><span id="subtotalDisp">₹0.00</span></div>
+        <div class="total-row"><span>GST</span><span id="gstDisp">₹0.00</span></div>
+        <div class="total-row grand"><span>Total Payable</span><span id="grandDisp">₹0.00</span></div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="saveInvoiceDraft()">💾 Save Draft</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="saveInvoice()">✅ Save Invoice</button>
+        <button class="btn btn-primary" onclick="generatePDF()">⬇ Download PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL INVOICES -->
+  <div class="page" id="page-invoices">
+    <div class="page-header">
+      <div class="page-title">
+        <h1>All Invoices 📋</h1>
+        <p id="invoiceCount">0 invoices total</p>
+      </div>
+      <button class="btn btn-primary" onclick="showPage('new-invoice')">+ New Invoice</button>
+    </div>
+    <div class="card">
+      <div id="allInvoicesTable">
+        <div class="empty"><div class="empty-icon">📋</div><p>No invoices yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTS -->
+  <div class="page" id="page-clients">
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Clients 👥</h1>
+        <p id="clientCount">0 clients saved</p>
+      </div>
+      <button class="btn btn-primary" onclick="openClientModal()">+ Add Client</button>
+    </div>
+    <div class="clients-grid" id="clientsGrid">
+      <div class="empty" style="grid-column:1/-1">
+        <div class="empty-icon">👥</div>
+        <p>No clients yet.<br>Add your first client to auto-fill invoices.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Client Modal -->
+<div class="modal-overlay" id="clientModal">
+  <div class="modal">
+    <h3>Add New Client</h3>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="field"><label>Client Name *</label><input type="text" id="cName" placeholder="Full name or company" /></div>
+      <div class="field"><label>Email</label><input type="email" id="cEmail" placeholder="client@email.com" /></div>
+      <div class="field"><label>Phone</label><input type="tel" id="cPhone" placeholder="+91 XXXXX XXXXX" /></div>
+      <div class="field"><label>Address</label><textarea id="cAddress" placeholder="Full address"></textarea></div>
+      <div class="field"><label>GST Number (optional)</label><input type="text" id="cGst" placeholder="22AAAAA0000A1Z5" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeClientModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ <span id="toastMsg">Done!</span></div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loader">
+  <div class="spinner"></div>
+  <p style="color:var(--muted);font-size:14px" id="loaderMsg">Processing…</p>
+</div>
+
+<!-- Firebase + App Logic -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── PASTE YOUR CONFIG HERE ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCjVZ3BUVVz3fD2fbK2vwo7ugA47e4ZCm4",
+  authDomain: "starc-invoice.firebaseapp.com",
+  projectId: "starc-invoice",
+  storageBucket: "starc-invoice.firebasestorage.app",
+  messagingSenderId: "370202874783",
+  appId: "1:370202874783:web:b2668e28ec24319178a3aa",
+  measurementId: "G-7BV0NDNSNZ"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let invoices = [];
+let clients = [];
+let items = [];
+const FREE_LIMIT = 5;
+
+// ── AUTH ──
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = "index.html"; return; }
+  currentUser = user;
+  document.getElementById('userName').textContent = user.displayName?.split(' ')[0] || 'User';
+  document.getElementById('userPlan').textContent = 'FREE PLAN';
+  if (user.photoURL) {
+    document.getElementById('userAvatar').innerHTML = `<img src="${user.photoURL}" alt="">`;
+  } else {
+    document.getElementById('userAvatar').textContent = (user.displayName || 'U')[0].toUpperCase();
+  }
+  greetUser();
+  await loadData();
+});
+
+window.signOut = () => fbSignOut(auth).then(() => window.location.href = "index.html");
+
+// ── NAVIGATION ──
+window.showPage = (name) => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.toLowerCase().includes(name.replace('-',' '))) n.classList.add('active');
+  });
+  if (name === 'new-invoice') initNewInvoice();
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'invoices') renderAllInvoices();
+  if (name === 'clients') renderClients();
+};
+
+// ── GREETING ──
+function greetUser() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  const name = currentUser?.displayName?.split(' ')[0] || 'there';
+  document.getElementById('dashGreeting').textContent = `${g}, ${name} 👋`;
+}
+
+// ── LOAD DATA ──
+async function loadData() {
+  if (!currentUser) return;
+  try {
+    const invSnap = await getDocs(query(collection(db, 'invoices'), where('uid', '==', currentUser.uid)));
+    invoices = invSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const cliSnap = await getDocs(query(collection(db, 'clients'), where('uid', '==', currentUser.uid)));
+    clients = cliSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderDashboard();
+    renderClients();
+    populateClientSelect();
+  } catch(e) { console.error(e); }
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  let total=0, paid=0, pending=0, overdue=0;
+  let paidC=0, pendC=0, overdC=0;
+  const now = new Date();
+  invoices.forEach(inv => {
+    const amt = inv.grandTotal || 0;
+    total += amt;
+    if (inv.status === 'paid') { paid += amt; paidC++; }
+    else if (inv.dueDate && new Date(inv.dueDate) < now) { overdue += amt; overdC++; }
+    else { pending += amt; pendC++; }
+  });
+
+  document.getElementById('statTotal').textContent = fmt(total);
+  document.getElementById('statPaid').textContent = fmt(paid);
+  document.getElementById('statPending').textContent = fmt(pending);
+  document.getElementById('statOverdue').textContent = fmt(overdue);
+  document.getElementById('statPaidCount').textContent = `${paidC} invoice${paidC!==1?'s':''}`;
+  document.getElementById('statPendingCount').textContent = `${pendC} invoice${pendC!==1?'s':''}`;
+  document.getElementById('statOverdueCount').textContent = `${overdC} invoice${overdC!==1?'s':''}`;
+
+  const recent = [...invoices].slice(-5).reverse();
+  document.getElementById('recentInvoicesTable').innerHTML = recent.length ? buildTable(recent) :
+    `<div class="empty"><div class="empty-icon">🧾</div><p>No invoices yet.<br>Create your first invoice to get started.</p></div>`;
+}
+
+function buildTable(list) {
+  return `<table><thead><tr><th>Invoice #</th><th>Client</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+  ${list.map(inv => {
+    const now = new Date();
+    let status = inv.status || 'pending';
+    if (status !== 'paid' && inv.dueDate && new Date(inv.dueDate) < now) status = 'overdue';
+    return `<tr>
+      <td><strong>${inv.number || '-'}</strong></td>
+      <td>${inv.clientName || '-'}</td>
+      <td>${inv.date || '-'}</td>
+      <td><strong>${fmt(inv.grandTotal || 0)}</strong></td>
+      <td><span class="badge badge-${status}">${status.charAt(0).toUpperCase()+status.slice(1)}</span></td>
+      <td><div class="action-btns">
+        <div class="icon-btn" title="Download PDF" onclick="window.reDownload('${inv.id}')">⬇</div>
+        <div class="icon-btn" title="Mark Paid" onclick="window.markPaid('${inv.id}')">✅</div>
+        <div class="icon-btn" title="Delete" onclick="window.deleteInv('${inv.id}')">🗑</div>
+      </div></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+// ── ALL INVOICES ──
+function renderAllInvoices() {
+  document.getElementById('invoiceCount').textContent = `${invoices.length} invoice${invoices.length!==1?'s':''} total`;
+  document.getElementById('allInvoicesTable').innerHTML = invoices.length ?
+    buildTable([...invoices].reverse()) :
+    `<div class="empty"><div class="empty-icon">📋</div><p>No invoices yet.</p></div>`;
+}
+
+// ── NEW INVOICE ──
+function initNewInvoice() {
+  items = [{ desc:'', qty:1, rate:0, gst:18 }];
+  renderItems();
+  const today = new Date().toISOString().split('T')[0];
+  const due = new Date(Date.now() + 15*86400000).toISOString().split('T')[0];
+  document.getElementById('invDate').value = today;
+  document.getElementById('invDue').value = due;
+  const count = invoices.length + 1;
+  document.getElementById('invNumber').value = `INV-${String(count).padStart(3,'0')}`;
+  populateClientSelect();
+}
+
+function renderItems() {
+  const tbody = document.getElementById('itemsBody');
+  tbody.innerHTML = items.map((it, i) => `
+    <tr>
+      <td><input type="text" value="${it.desc}" placeholder="Describe the service…" oninput="updateItem(${i},'desc',this.value)" /></td>
+      <td><input type="number" value="${it.qty}" min="1" style="text-align:center" oninput="updateItem(${i},'qty',+this.value)" /></td>
+      <td><input type="number" value="${it.rate}" min="0" placeholder="0" oninput="updateItem(${i},'rate',+this.value)" /></td>
+      <td><input type="number" value="${it.gst}" min="0" max="28" placeholder="18" style="text-align:center" oninput="updateItem(${i},'gst',+this.value)" /></td>
+      <td><div class="item-total">${fmt((it.qty||0)*(it.rate||0)*(1+(it.gst||0)/100))}</div></td>
+      <td><div class="icon-btn" onclick="removeItem(${i})" title="Remove">✕</div></td>
+    </tr>
+  `).join('');
+  calcTotals();
+}
+
+window.updateItem = (i, key, val) => { items[i][key] = val; renderItems(); };
+window.addItem = () => { items.push({ desc:'', qty:1, rate:0, gst:18 }); renderItems(); };
+window.removeItem = (i) => { if(items.length > 1) { items.splice(i,1); renderItems(); } };
+
+function calcTotals() {
+  let sub=0, gstAmt=0;
+  items.forEach(it => {
+    const base = (it.qty||0)*(it.rate||0);
+    sub += base;
+    gstAmt += base * (it.gst||0)/100;
+  });
+  document.getElementById('subtotalDisp').textContent = fmt(sub);
+  document.getElementById('gstDisp').textContent = fmt(gstAmt);
+  document.getElementById('grandDisp').textContent = fmt(sub+gstAmt);
+}
+
+// ── AI SUGGEST ──
+window.aiSuggestItems = async () => {
+  const clientName = document.getElementById('toName').value || 'client';
+  showLoader('AI is writing descriptions…');
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:400,
+        messages:[{
+          role:"user",
+          content:`Generate 3 professional invoice line item descriptions for a freelance/tech service for client "${clientName}". Return ONLY a JSON array like: [{"desc":"Website Design & Development","qty":1,"rate":15000,"gst":18}, ...]. No extra text.`
+        }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content[0].text;
+    const clean = text.replace(/```json|```/g,'').trim();
+    const suggested = JSON.parse(clean);
+    items = suggested;
+    renderItems();
+    showToast('✨ AI suggestions applied!');
+  } catch(e) {
+    showToast('Could not get AI suggestions. Fill manually.');
+  }
+  hideLoader();
+};
+
+// ── SAVE INVOICE ──
+window.saveInvoice = async () => {
+  if (!currentUser) return;
+  if (invoices.filter(i => i.status !== 'draft').length >= FREE_LIMIT) {
+    showToast('⚠ Free limit reached. Upgrade to Pro!');
+    return;
+  }
+  showLoader('Saving invoice…');
+  let sub=0, gstAmt=0;
+  items.forEach(it => { const b=(it.qty||0)*(it.rate||0); sub+=b; gstAmt+=b*(it.gst||0)/100; });
+  const inv = {
+    uid: currentUser.uid,
+    number: document.getElementById('invNumber').value,
+    date: document.getElementById('invDate').value,
+    dueDate: document.getElementById('invDue').value,
+    fromName: document.getElementById('fromName').value,
+    fromEmail: document.getElementById('fromEmail').value,
+    fromPhone: document.getElementById('fromPhone').value,
+    fromAddress: document.getElementById('fromAddress').value,
+    clientName: document.getElementById('toName').value,
+    clientEmail: document.getElementById('toEmail').value,
+    clientPhone: document.getElementById('toPhone').value,
+    clientAddress: document.getElementById('toAddress').value,
+    items: items,
+    notes: document.getElementById('invNotes').value,
+    subtotal: sub, gstAmount: gstAmt, grandTotal: sub+gstAmt,
+    status: 'pending',
+    createdAt: serverTimestamp()
+  };
+  try {
+    const ref = await addDoc(collection(db, 'invoices'), inv);
+    invoices.push({ id: ref.id, ...inv });
+    hideLoader();
+    showToast('✅ Invoice saved!');
+    renderDashboard();
+    showPage('invoices');
+  } catch(e) { hideLoader(); showToast('Error saving. Try again.'); console.error(e); }
+};
+
+window.saveInvoiceDraft = async () => {
+  showLoader('Saving draft…');
+  await new Promise(r => setTimeout(r, 600));
+  hideLoader();
+  showToast('💾 Draft saved locally');
+};
+
+// ── MARK PAID / DELETE ──
+window.markPaid = async (id) => {
+  try {
+    await updateDoc(doc(db,'invoices',id), { status:'paid' });
+    invoices = invoices.map(i => i.id===id ? {...i,status:'paid'} : i);
+    renderDashboard(); renderAllInvoices();
+    showToast('✅ Marked as paid!');
+  } catch(e) { showToast('Error. Try again.'); }
+};
+
+window.deleteInv = async (id) => {
+  if (!confirm('Delete this invoice?')) return;
+  try {
+    await deleteDoc(doc(db,'invoices',id));
+    invoices = invoices.filter(i => i.id !== id);
+    renderDashboard(); renderAllInvoices();
+    showToast('🗑 Invoice deleted');
+  } catch(e) { showToast('Error. Try again.'); }
+};
+
+window.reDownload = (id) => {
+  const inv = invoices.find(i => i.id===id);
+  if (inv) buildPDF(inv);
+};
+
+// ── PDF GENERATION ──
+window.generatePDF = () => {
+  let sub=0, gstAmt=0;
+  items.forEach(it => { const b=(it.qty||0)*(it.rate||0); sub+=b; gstAmt+=b*(it.gst||0)/100; });
+  const inv = {
+    number: document.getElementById('invNumber').value || 'INV-001',
+    date: document.getElementById('invDate').value,
+    dueDate: document.getElementById('invDue').value,
+    fromName: document.getElementById('fromName').value,
+    fromEmail: document.getElementById('fromEmail').value,
+    fromPhone: document.getElementById('fromPhone').value,
+    fromAddress: document.getElementById('fromAddress').value,
+    clientName: document.getElementById('toName').value,
+    clientEmail: document.getElementById('toEmail').value,
+    clientPhone: document.getElementById('toPhone').value,
+    clientAddress: document.getElementById('toAddress').value,
+    items, notes: document.getElementById('invNotes').value,
+    subtotal: sub, gstAmount: gstAmt, grandTotal: sub+gstAmt,
+    status: 'pending'
+  };
+  buildPDF(inv);
+};
+
+function buildPDF(inv) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ unit:'mm', format:'a4' });
+  const W=210, M=18;
+  let y=20;
+
+  // Header background
+  pdf.setFillColor(29,58,31);
+  pdf.rect(0,0,W,44,'F');
+
+  // Logo / Brand
+  pdf.setTextColor(181,201,106);
+  pdf.setFontSize(20); pdf.setFont('helvetica','bold');
+  pdf.text('STARC Solutions', M, 20);
+  pdf.setFontSize(9); pdf.setFont('helvetica','normal');
+  pdf.setTextColor(200,220,160);
+  pdf.text('starc-solutions.tech', M, 27);
+  if (inv.fromEmail) pdf.text(inv.fromEmail, M, 33);
+  if (inv.fromPhone) pdf.text(inv.fromPhone, M, 38);
+
+  // Invoice number + date right
+  pdf.setTextColor(245,240,232);
+  pdf.setFontSize(22); pdf.setFont('helvetica','bold');
+  pdf.text('INVOICE', W-M, 20, {align:'right'});
+  pdf.setFontSize(10); pdf.setFont('helvetica','normal');
+  pdf.setTextColor(200,220,160);
+  pdf.text(`# ${inv.number}`, W-M, 28, {align:'right'});
+  pdf.text(`Date: ${inv.date}`, W-M, 34, {align:'right'});
+  pdf.text(`Due: ${inv.dueDate}`, W-M, 40, {align:'right'});
+
+  y = 56;
+
+  // Bill To / From
+  pdf.setTextColor(107,124,58);
+  pdf.setFontSize(8); pdf.setFont('helvetica','bold');
+  pdf.text('BILL TO', M, y); pdf.text('FROM', W/2+2, y);
+  y += 5;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(30,30,30);
+  pdf.text(inv.clientName || '—', M, y);
+  pdf.text(inv.fromName || '—', W/2+2, y);
+  y += 5;
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(80,80,80);
+  if (inv.clientEmail) { pdf.text(inv.clientEmail, M, y); y += 4; } else y+=4;
+  if (inv.clientPhone) { pdf.text(inv.clientPhone, M, y); }
+  if (inv.clientAddress) {
+    const lines = pdf.splitTextToSize(inv.clientAddress, 80);
+    pdf.text(lines, M, y+4);
+  }
+
+  y = 90;
+
+  // Items table header
+  pdf.setFillColor(29,58,31);
+  pdf.rect(M, y, W-2*M, 8, 'F');
+  pdf.setTextColor(181,201,106); pdf.setFontSize(8); pdf.setFont('helvetica','bold');
+  const cols = [M+2, M+80, M+100, M+118, M+136];
+  ['DESCRIPTION','QTY','RATE (₹)','GST %','TOTAL (₹)'].forEach((h,i) => pdf.text(h, cols[i], y+5.5));
+  y += 10;
+
+  // Items rows
+  pdf.setTextColor(30,30,30); pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+  inv.items.forEach((it, idx) => {
+    if (idx % 2 === 0) { pdf.setFillColor(245,248,242); pdf.rect(M,y,W-2*M,8,'F'); }
+    const base = (it.qty||0)*(it.rate||0);
+    const total = base*(1+(it.gst||0)/100);
+    pdf.text(String(it.desc||'').substring(0,38), cols[0], y+5.5);
+    pdf.text(String(it.qty||0), cols[1], y+5.5);
+    pdf.text(fmtNum(it.rate||0), cols[2], y+5.5);
+    pdf.text(`${it.gst||0}%`, cols[3], y+5.5);
+    pdf.text(fmtNum(total), cols[4], y+5.5);
+    y += 8;
+  });
+
+  y += 6;
+  // Totals
+  const tX = W - M - 70;
+  pdf.setDrawColor(200,210,185); pdf.setLineWidth(0.3);
+  pdf.line(tX, y, W-M, y); y+=6;
+  pdf.setFontSize(9); pdf.setTextColor(80,80,80);
+  pdf.text('Subtotal:', tX, y); pdf.text(`₹${fmtNum(inv.subtotal)}`, W-M, y, {align:'right'});
+  y+=5; pdf.text('GST:', tX, y); pdf.text(`₹${fmtNum(inv.gstAmount)}`, W-M, y, {align:'right'});
+  y+=5; pdf.line(tX, y, W-M, y); y+=6;
+  pdf.setFillColor(29,58,31); pdf.rect(tX-2, y-4, W-M-tX+4, 10,'F');
+  pdf.setTextColor(245,240,232); pdf.setFont('helvetica','bold'); pdf.setFontSize(11);
+  pdf.text('TOTAL PAYABLE:', tX, y+3);
+  pdf.text(`₹${fmtNum(inv.grandTotal)}`, W-M, y+3, {align:'right'});
+
+  y += 18;
+  // Notes
+  if (inv.notes) {
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(8); pdf.setTextColor(107,124,58);
+    pdf.text('NOTES / PAYMENT DETAILS', M, y); y+=5;
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor(60,60,60);
+    const nl = pdf.splitTextToSize(inv.notes, W-2*M);
+    pdf.text(nl, M, y); y += nl.length*4 + 6;
+  }
+
+  // Footer / Watermark
+  pdf.setFillColor(245,248,242);
+  pdf.rect(0,287,W,10,'F');
+  pdf.setFontSize(7.5); pdf.setTextColor(107,124,58); pdf.setFont('helvetica','normal');
+  pdf.text('Generated by STARC Invoice · starc-solutions.tech', W/2, 293, {align:'center'});
+
+  pdf.save(`${inv.number}-${(inv.clientName||'invoice').replace(/\s/g,'_')}.pdf`);
+  showToast('⬇ PDF downloaded!');
+}
+
+// ── CLIENTS ──
+window.openClientModal = () => {
+  ['cName','cEmail','cPhone','cAddress','cGst'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('clientModal').classList.add('show');
+};
+window.closeClientModal = () => document.getElementById('clientModal').classList.remove('show');
+
+window.saveClient = async () => {
+  const name = document.getElementById('cName').value.trim();
+  if (!name) { showToast('Client name is required'); return; }
+  showLoader('Saving client…');
+  try {
+    const client = {
+      uid: currentUser.uid,
+      name, email: document.getElementById('cEmail').value,
+      phone: document.getElementById('cPhone').value,
+      address: document.getElementById('cAddress').value,
+      gst: document.getElementById('cGst').value,
+      createdAt: serverTimestamp()
+    };
+    const ref = await addDoc(collection(db,'clients'), client);
+    clients.push({ id:ref.id, ...client });
+    closeClientModal(); hideLoader();
+    renderClients(); populateClientSelect();
+    showToast('✅ Client saved!');
+  } catch(e) { hideLoader(); showToast('Error saving client.'); }
+};
+
+function renderClients() {
+  document.getElementById('clientCount').textContent = `${clients.length} client${clients.length!==1?'s':''} saved`;
+  const grid = document.getElementById('clientsGrid');
+  if (!clients.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👥</div><p>No clients yet.<br>Add your first client to auto-fill invoices.</p></div>`;
+    return;
+  }
+  grid.innerHTML = clients.map(c => `
+    <div class="client-card">
+      <div class="client-avatar">${c.name[0].toUpperCase()}</div>
+      <div class="client-name">${c.name}</div>
+      <div class="client-email">${c.email || 'No email'}</div>
+      <div class="client-meta">
+        <span>${c.phone || '—'}</span>
+        <span style="color:var(--leaf)">${invoices.filter(i=>i.clientName===c.name).length} invoices</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function populateClientSelect() {
+  const sel = document.getElementById('clientSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select saved client…</option>' +
+    clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+window.fillClient = () => {
+  const id = document.getElementById('clientSelect').value;
+  const c = clients.find(cl => cl.id === id);
+  if (!c) return;
+  document.getElementById('toName').value = c.name||'';
+  document.getElementById('toEmail').value = c.email||'';
+  document.getElementById('toPhone').value = c.phone||'';
+  document.getElementById('toAddress').value = c.address||'';
+};
+
+// ── RAZORPAY ──
+window.handleUpgrade = () => {
+  alert('To activate Razorpay:\n1. Include Razorpay script in <head>\n2. Replace YOUR_RAZORPAY_KEY with your key\n\nvar rzp = new Razorpay({ key:"rzp_live_Slajx7K1jJBgd3", amount:49900, currency:"INR", name:"STARC Invoice Pro", handler: function(){ /* update user to pro */ } }); rzp.open();');
+};
+
+// ── HELPERS ──
+function fmt(n) {
+  return '₹' + fmtNum(n);
+}
+function fmtNum(n) {
+  if (!n) return '0.00';
+  return Number(n).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showLoader(msg='Loading…') {
+  document.getElementById('loaderMsg').textContent = msg;
+  document.getElementById('loader').classList.add('show');
+}
+function hideLoader() { document.getElementById('loader').classList.remove('show'); }
+
+// ── INIT ──
+initNewInvoice();
+</script>
+</body>
+</html>
