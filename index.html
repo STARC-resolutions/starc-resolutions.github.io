@@ -1,71 +1,1232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.T.A.R.C. RESOLUTIONS | REBOOT</title>
-    <style>
-        body { 
-            background: #050505; 
-            color: #00d4ff; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            flex-direction: column;
-            height: 100vh; 
-            align-items: center; 
-            justify-content: center; 
-            margin: 0; 
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STARC Technologies – Grow With AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark-green: #1a3a1f;
+    --forest: #2d5a27;
+    --olive: #6b7c3a;
+    --leaf: #8aad3f;
+    --light-leaf: #b5c96a;
+    --brown: #5c3d1e;
+    --bark: #7a4f2d;
+    --cream: #f5f0e8;
+    --gold: #c9a84c;
+    --bg: #0d1f0f;
+  }
 
-        .brand-header {
-            font-size: 0.7rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            opacity: 0.6;
-            margin-bottom: 10px;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        h1 { 
-            letter-spacing: 12px; 
-            text-transform: uppercase; 
-            font-size: clamp(1.5rem, 5vw, 2.5rem); 
-            border-right: 4px solid #00d4ff; 
-            padding-right: 15px; 
-            margin: 0;
-            animation: blink 0.8s step-end infinite; 
-        }
+  html { scroll-behavior: smooth; }
 
-        .caption {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            font-weight: 300;
-            text-transform: lowercase;
-            color: #aaaaaa;
-            text-align: center;
-        }
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
 
-        .accent-blue {
-            color: #00d4ff;
-            font-weight: bold;
-        }
+  /* Custom Cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--leaf);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--leaf);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: all 0.15s ease;
+    opacity: 0.6;
+  }
 
-        @keyframes blink { 
-            0%, 100% { border-color: transparent; } 
-            50% { border-color: #00d4ff; } 
-        }
-    </style>
+  /* ===== HERO SECTION ===== */
+  #hero {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Sky gradient */
+  #hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, #0a2e0d 0%, #061008 60%, #020604 100%);
+    z-index: 0;
+  }
+
+  /* Stars */
+  .stars {
+    position: absolute; inset: 0; z-index: 1;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 8%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 5%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 25%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 20% 40%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 35%, rgba(255,255,255,0.3) 0%, transparent 100%);
+  }
+
+  /* SVG Tree Canvas */
+  #tree-canvas {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 900px;
+    z-index: 2;
+  }
+
+  /* Ground glow */
+  .ground-glow {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 120px;
+    background: radial-gradient(ellipse, rgba(107,124,58,0.3) 0%, transparent 70%);
+    z-index: 1;
+  }
+
+  /* Hero Content */
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 20px;
+    margin-bottom: 280px;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(45,90,39,0.3);
+    border: 1px solid rgba(138,173,63,0.3);
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light-leaf);
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+    animation: fadeDown 1s ease both;
+  }
+
+  .logo-dot {
+    width: 6px; height: 6px;
+    background: var(--leaf);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--cream);
+    animation: fadeUp 1s ease 0.2s both;
+  }
+
+  h1 span {
+    color: var(--leaf);
+    display: block;
+  }
+
+  .tagline {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: rgba(245,240,232,0.6);
+    margin-top: 16px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    animation: fadeUp 1s ease 0.4s both;
+  }
+
+  /* Search Bar */
+  .search-wrap {
+    margin-top: 36px;
+    display: flex;
+    justify-content: center;
+    animation: fadeUp 1s ease 0.6s both;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: rgba(245,240,232,0.06);
+    border: 1px solid rgba(138,173,63,0.4);
+    border-radius: 50px;
+    padding: 10px 10px 10px 22px;
+    width: min(480px, 90vw);
+    backdrop-filter: blur(20px);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    gap: 10px;
+  }
+
+  .search-bar:focus-within {
+    border-color: var(--leaf);
+    box-shadow: 0 0 0 3px rgba(138,173,63,0.15), 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .search-bar svg { color: var(--olive); flex-shrink: 0; }
+
+  .search-bar input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+  }
+
+  .search-bar input::placeholder { color: rgba(245,240,232,0.35); }
+
+  .search-btn {
+    background: var(--forest);
+    border: 1px solid var(--leaf);
+    border-radius: 40px;
+    padding: 9px 20px;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: none;
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+  }
+
+  .search-btn:hover { background: var(--olive); transform: scale(1.04); }
+
+  /* Scroll hint */
+  .scroll-hint {
+    position: absolute;
+    bottom: 36px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(245,240,232,0.35);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: fadeUp 1.5s ease 1.5s both;
+  }
+
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--leaf), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+
+  /* ===== BIRD MENU ===== */
+  #bird-btn {
+    position: fixed;
+    top: 30px; left: 30px;
+    z-index: 1000;
+    cursor: none;
+    width: 60px; height: 60px;
+  }
+
+  #bird-btn svg {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 0 8px rgba(138,173,63,0.5));
+    transition: transform 0.3s;
+  }
+
+  #bird-btn:hover svg { transform: scale(1.15) rotate(-5deg); }
+  #bird-btn.flap svg { animation: birdFlap 0.4s ease; }
+
+  .bird-menu {
+    position: fixed;
+    top: 0; left: 0;
+    width: 320px;
+    height: 100vh;
+    background: linear-gradient(160deg, rgba(13,31,15,0.97) 0%, rgba(29,58,31,0.97) 100%);
+    border-right: 1px solid rgba(138,173,63,0.2);
+    backdrop-filter: blur(20px);
+    z-index: 999;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.77,0,0.18,1);
+    display: flex;
+    flex-direction: column;
+    padding: 100px 40px 40px;
+    gap: 10px;
+  }
+
+  .bird-menu.open { transform: translateX(0); }
+
+  .bird-menu h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--olive);
+    margin-bottom: 16px;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: none;
+  }
+
+  .menu-item:hover {
+    background: rgba(138,173,63,0.1);
+    border-color: rgba(138,173,63,0.3);
+  }
+
+  .menu-icon {
+    width: 36px; height: 36px;
+    background: rgba(107,124,58,0.25);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .menu-tip {
+    margin-top: auto;
+    background: rgba(138,173,63,0.08);
+    border: 1px solid rgba(138,173,63,0.2);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 13px;
+    color: rgba(245,240,232,0.6);
+    line-height: 1.6;
+  }
+
+  .menu-tip strong { color: var(--leaf); }
+
+  .menu-close {
+    position: absolute;
+    top: 24px; right: 20px;
+    background: none; border: none;
+    color: var(--cream); font-size: 22px;
+    cursor: none; opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .menu-close:hover { opacity: 1; }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+    cursor: none;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  /* ===== ABOUT SECTION ===== */
+  #about {
+    padding: 120px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--olive);
+    border-bottom: 1px solid var(--olive);
+    padding-bottom: 4px;
+    margin-bottom: 24px;
+  }
+
+  #about h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.15;
+    margin-bottom: 28px;
+  }
+
+  #about h2 em { font-style: italic; color: var(--leaf); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    margin-top: 60px;
+  }
+
+  .about-text p {
+    color: rgba(245,240,232,0.65);
+    line-height: 1.9;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 40px;
+    margin-top: 32px;
+  }
+
+  .stat { text-align: left; }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--leaf);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--olive);
+    margin-top: 4px;
+  }
+
+  .vision-card {
+    background: linear-gradient(135deg, rgba(45,90,39,0.25) 0%, rgba(107,124,58,0.1) 100%);
+    border: 1px solid rgba(138,173,63,0.2);
+    border-radius: 20px;
+    padding: 40px;
+  }
+
+  .vision-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .vision-card p {
+    color: rgba(245,240,232,0.6);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  .timeline {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .tl-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+    color: rgba(245,240,232,0.7);
+  }
+
+  .tl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--leaf);
+    flex-shrink: 0;
+    box-shadow: 0 0 8px var(--leaf);
+  }
+
+  .tl-dot.dim { background: var(--olive); box-shadow: none; opacity: 0.5; }
+
+  /* ===== TOOLS SECTION ===== */
+  #tools {
+    padding: 120px 40px;
+    background: linear-gradient(to bottom, transparent, rgba(13,31,15,0.8));
+  }
+
+  .tools-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 70px;
+  }
+
+  .tools-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 14px;
+  }
+
+  .tools-header p {
+    color: rgba(245,240,232,0.5);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .tool-card {
+    background: rgba(245,240,232,0.03);
+    border: 1px solid rgba(138,173,63,0.15);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    cursor: none;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(138,173,63,0.5);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.4), 0 0 20px rgba(138,173,63,0.1);
+  }
+
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: -40%; left: -40%;
+    width: 80%; height: 80%;
+    background: radial-gradient(circle, rgba(138,173,63,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tool-fruit {
+    font-size: 2.8rem;
+    margin-bottom: 16px;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  }
+
+  .tool-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+
+  .tool-card p {
+    color: rgba(245,240,232,0.5);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .tool-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .badge-free { background: rgba(138,173,63,0.15); color: var(--leaf); }
+  .badge-soon { background: rgba(107,124,58,0.1); color: var(--olive); }
+
+  .tool-btn {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    padding: 11px;
+    border-radius: 10px;
+    border: 1px solid rgba(138,173,63,0.3);
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: rgba(138,173,63,0.05);
+  }
+
+  .tool-btn:hover { background: rgba(138,173,63,0.15); border-color: var(--leaf); }
+
+  /* Coming Soon Card */
+  .tool-card.coming {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ===== PRICING ===== */
+  #pricing {
+    padding: 120px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  #pricing h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  #pricing .sub {
+    text-align: center;
+    color: rgba(245,240,232,0.5);
+    margin-bottom: 60px;
+    font-size: 15px;
+  }
+
+  .price-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .price-card {
+    background: rgba(245,240,232,0.03);
+    border: 1px solid rgba(138,173,63,0.15);
+    border-radius: 24px;
+    padding: 40px;
+  }
+
+  .price-card.featured {
+    background: linear-gradient(135deg, rgba(45,90,39,0.4) 0%, rgba(107,124,58,0.2) 100%);
+    border-color: rgba(138,173,63,0.5);
+    position: relative;
+  }
+
+  .featured-badge {
+    position: absolute;
+    top: -13px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--leaf);
+    color: var(--dark-green);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 16px;
+    border-radius: 20px;
+  }
+
+  .price-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+
+  .price-amount {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin: 16px 0 4px;
+  }
+
+  .price-amount sup { font-size: 1.2rem; }
+  .price-amount small { font-size: 1rem; color: rgba(245,240,232,0.4); font-weight: 300; }
+
+  .price-desc {
+    color: rgba(245,240,232,0.45);
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  .price-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .price-features li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px;
+    color: rgba(245,240,232,0.7);
+  }
+
+  .price-features li::before {
+    content: '✦';
+    color: var(--leaf);
+    font-size: 10px;
+  }
+
+  .cta-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .cta-green {
+    background: var(--forest);
+    border: 1px solid var(--leaf);
+    color: var(--cream);
+  }
+
+  .cta-green:hover { background: var(--olive); transform: scale(1.02); }
+
+  .cta-outline {
+    background: transparent;
+    border: 1px solid rgba(138,173,63,0.3);
+    color: var(--cream);
+  }
+
+  .cta-outline:hover { border-color: var(--leaf); background: rgba(138,173,63,0.05); }
+
+  .razorpay-note {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 12px;
+    color: rgba(245,240,232,0.3);
+    letter-spacing: 1px;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding: 60px 40px;
+    border-top: 1px solid rgba(138,173,63,0.1);
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+
+  .footer-logo span { color: var(--leaf); }
+
+  footer p {
+    color: rgba(245,240,232,0.25);
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  @keyframes birdFlap {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-20deg) scaleY(0.8); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+  }
+
+  @keyframes fruitBob {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .leaf-group { animation: sway 4s ease-in-out infinite; transform-origin: bottom center; }
+  .fruit { animation: fruitBob 3s ease-in-out infinite; }
+  .fruit:nth-child(2) { animation-delay: 0.5s; }
+  .fruit:nth-child(3) { animation-delay: 1s; }
+  .fruit:nth-child(4) { animation-delay: 1.5s; }
+
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .about-grid, .price-grid { grid-template-columns: 1fr; }
+    .stat-row { gap: 24px; }
+    #bird-btn { top: 16px; left: 16px; width: 48px; height: 48px; }
+    .hero-content { margin-bottom: 240px; }
+  }
+</style>
 </head>
 <body>
 
-    <div class="brand-header">S.T.A.R.C. Technologies</div>
-    
-    <h1>SYSTEMS REBOOTING</h1>
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-    <div class="caption">
-        S.T.A.R.C Technologies coming back with <span class="accent-blue"> real sarvesh's real solutions</span>
+<!-- Bird Menu Button -->
+<div id="bird-btn" title="Menu" onclick="toggleMenu()">
+  <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Body -->
+    <ellipse cx="38" cy="44" rx="18" ry="13" fill="#2d5a27"/>
+    <!-- Wing -->
+    <path d="M22 44 Q10 34 16 28 Q26 40 38 38" fill="#3d7a35"/>
+    <!-- Head -->
+    <circle cx="52" cy="32" r="12" fill="#2d5a27"/>
+    <!-- Eye -->
+    <circle cx="56" cy="30" r="3" fill="#0d1f0f"/>
+    <circle cx="57" cy="29" r="1" fill="white"/>
+    <!-- Beak -->
+    <path d="M63 32 L70 30 L63 35Z" fill="#c9a84c"/>
+    <!-- Tail feathers -->
+    <path d="M22 48 L8 56 L14 46 L20 52Z" fill="#1a3a1f"/>
+    <!-- Branch -->
+    <path d="M10 62 Q40 58 70 60" stroke="#7a4f2d" stroke-width="4" stroke-linecap="round"/>
+    <!-- Feet -->
+    <line x1="36" y1="56" x2="34" y2="62" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round"/>
+    <line x1="34" y1="62" x2="30" y2="64" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round"/>
+    <line x1="34" y1="62" x2="36" y2="65" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round"/>
+    <line x1="42" y1="56" x2="44" y2="62" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round"/>
+    <line x1="44" y1="62" x2="48" y2="64" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round"/>
+    <line x1="44" y1="62" x2="42" y2="65" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<!-- Bird Menu -->
+<nav class="bird-menu" id="birdMenu">
+  <button class="menu-close" onclick="toggleMenu()">✕</button>
+  <h3>Navigate</h3>
+  <a href="#about" class="menu-item" onclick="toggleMenu()">
+    <span class="menu-icon">🌿</span> Our Story
+  </a>
+  <a href="#tools" class="menu-item" onclick="toggleMenu()">
+    <span class="menu-icon">🍎</span> AI Tools
+  </a>
+  <a href="#pricing" class="menu-item" onclick="toggleMenu()">
+    <span class="menu-icon">🌱</span> Plans & Pricing
+  </a>
+  <a href="mailto:hello@starc-solutions.tech" class="menu-item">
+    <span class="menu-icon">🪺</span> Contact Us
+  </a>
+
+  <div class="menu-tip">
+    <strong>🌳 Did you know?</strong><br>
+    Just like a tree grows one ring per year, STARC adds one AI tool per month. Every tool you see is a fruit we've grown for you.
+  </div>
+</nav>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="stars"></div>
+  <div class="ground-glow"></div>
+
+  <!-- 3D-style SVG Tree -->
+  <svg id="tree-canvas" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+    <!-- Ground shadow -->
+    <ellipse cx="450" cy="510" rx="200" ry="18" fill="rgba(0,0,0,0.5)"/>
+
+    <!-- Roots -->
+    <path d="M420 490 Q390 510 360 505" stroke="#5c3d1e" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M430 492 Q410 515 380 518" stroke="#5c3d1e" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M460 490 Q490 510 520 505" stroke="#5c3d1e" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M450 492 Q470 515 500 518" stroke="#5c3d1e" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+    <!-- Main trunk -->
+    <path d="M415 490 Q408 400 420 320 Q425 260 440 180" stroke="#7a4f2d" stroke-width="36" fill="none" stroke-linecap="round"/>
+    <path d="M445 490 Q455 400 458 320 Q460 260 458 180" stroke="#5c3d1e" stroke-width="36" fill="none" stroke-linecap="round"/>
+    <!-- Bark highlight -->
+    <path d="M428 490 Q422 400 432 320 Q436 260 448 180" stroke="#9a6040" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.4"/>
+
+    <!-- Main branches -->
+    <!-- Left branch -->
+    <path d="M435 280 Q380 240 330 200 Q290 175 260 150" stroke="#7a4f2d" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M260 150 Q220 130 200 110" stroke="#7a4f2d" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path d="M330 200 Q310 170 290 145" stroke="#7a4f2d" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+    <!-- Right branch -->
+    <path d="M450 260 Q510 220 560 190 Q610 165 650 140" stroke="#7a4f2d" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M650 140 Q695 120 720 100" stroke="#7a4f2d" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path d="M560 190 Q590 160 610 135" stroke="#7a4f2d" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+    <!-- Top branch -->
+    <path d="M445 200 Q442 150 440 100 Q440 65 445 40" stroke="#7a4f2d" stroke-width="14" fill="none" stroke-linecap="round"/>
+    <path d="M445 40 Q435 15 425 0" stroke="#7a4f2d" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+    <!-- Leaf clusters — LEFT -->
+    <g class="leaf-group" style="transform-origin: 260px 160px">
+      <ellipse cx="220" cy="130" rx="75" ry="55" fill="#2d5a27" opacity="0.9"/>
+      <ellipse cx="180" cy="110" rx="55" ry="45" fill="#3d7a35"/>
+      <ellipse cx="250" cy="100" rx="60" ry="50" fill="#2d5a27"/>
+      <ellipse cx="200" cy="85" rx="50" ry="40" fill="#4a8a3a" opacity="0.8"/>
+      <ellipse cx="240" cy="70" rx="45" ry="38" fill="#3d7a35" opacity="0.9"/>
+      <!-- highlights -->
+      <ellipse cx="195" cy="88" rx="18" ry="12" fill="#5aad40" opacity="0.25"/>
+      <ellipse cx="245" cy="72" rx="15" ry="10" fill="#5aad40" opacity="0.2"/>
+    </g>
+
+    <!-- Sub branch left lower -->
+    <g class="leaf-group" style="transform-origin: 295px 155px; animation-delay: 0.5s">
+      <ellipse cx="280" cy="145" rx="50" ry="40" fill="#2d5a27"/>
+      <ellipse cx="305" cy="125" rx="45" ry="35" fill="#3d7a35"/>
+      <ellipse cx="270" cy="120" rx="40" ry="32" fill="#4a8a3a" opacity="0.8"/>
+    </g>
+
+    <!-- Leaf clusters — RIGHT -->
+    <g class="leaf-group" style="transform-origin: 660px 145px; animation-delay: 1s">
+      <ellipse cx="695" cy="110" rx="75" ry="55" fill="#2d5a27" opacity="0.9"/>
+      <ellipse cx="730" cy="95" rx="55" ry="45" fill="#3d7a35"/>
+      <ellipse cx="665" cy="90" rx="60" ry="50" fill="#2d5a27"/>
+      <ellipse cx="705" cy="75" rx="50" ry="40" fill="#4a8a3a" opacity="0.8"/>
+      <ellipse cx="670" cy="65" rx="45" ry="38" fill="#3d7a35" opacity="0.9"/>
+      <ellipse cx="710" cy="78" rx="18" ry="12" fill="#5aad40" opacity="0.25"/>
+    </g>
+
+    <g class="leaf-group" style="transform-origin: 615px 140px; animation-delay: 1.5s">
+      <ellipse cx="605" cy="130" rx="50" ry="40" fill="#2d5a27"/>
+      <ellipse cx="625" cy="115" rx="45" ry="35" fill="#3d7a35"/>
+      <ellipse cx="590" cy="115" rx="40" ry="32" fill="#4a8a3a" opacity="0.8"/>
+    </g>
+
+    <!-- Leaf cluster — TOP -->
+    <g class="leaf-group" style="transform-origin: 445px 60px; animation-delay: 0.3s">
+      <ellipse cx="445" cy="40" rx="65" ry="55" fill="#2d5a27"/>
+      <ellipse cx="420" cy="25" rx="50" ry="42" fill="#3d7a35"/>
+      <ellipse cx="470" cy="20" rx="55" ry="45" fill="#2d5a27"/>
+      <ellipse cx="445" cy="10" rx="45" ry="38" fill="#4a8a3a" opacity="0.85"/>
+      <ellipse cx="440" cy="8" rx="20" ry="14" fill="#5aad40" opacity="0.25"/>
+    </g>
+
+    <!-- FRUITS (Tools) -->
+    <!-- Fruit 1 - left cluster -->
+    <g class="fruit">
+      <circle cx="208" cy="120" r="16" fill="#c0392b"/>
+      <circle cx="208" cy="120" r="16" fill="url(#redGrad)"/>
+      <path d="M208 104 Q212 98 216 100" stroke="#2d5a27" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="203" cy="115" rx="5" ry="7" fill="rgba(255,255,255,0.25)" transform="rotate(-20,203,115)"/>
+    </g>
+
+    <!-- Fruit 2 - right cluster -->
+    <g class="fruit" style="animation-delay:0.6s">
+      <circle cx="698" cy="100" r="15" fill="#e67e22"/>
+      <circle cx="698" cy="100" r="15" fill="url(#orangeGrad)"/>
+      <path d="M698 85 Q702 79 706 81" stroke="#2d5a27" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="693" cy="96" rx="4" ry="6" fill="rgba(255,255,255,0.25)" transform="rotate(-20,693,96)"/>
+    </g>
+
+    <!-- Fruit 3 - top cluster -->
+    <g class="fruit" style="animation-delay:1.1s">
+      <circle cx="450" cy="28" r="14" fill="#8e44ad"/>
+      <circle cx="450" cy="28" r="14" fill="url(#purpleGrad)"/>
+      <path d="M450 14 Q454 8 458 10" stroke="#2d5a27" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="445" cy="23" rx="4" ry="5" fill="rgba(255,255,255,0.25)" transform="rotate(-20,445,23)"/>
+    </g>
+
+    <!-- Future fruit (dimmed) -->
+    <g class="fruit" style="animation-delay:1.8s; opacity:0.3">
+      <circle cx="295" cy="140" r="12" fill="#27ae60"/>
+      <circle cx="295" cy="140" r="12" fill="url(#greenFrGrad)"/>
+    </g>
+    <g class="fruit" style="animation-delay:2.2s; opacity:0.2">
+      <circle cx="618" cy="125" r="11" fill="#f39c12"/>
+    </g>
+
+    <!-- Gradients -->
+    <defs>
+      <radialGradient id="redGrad" cx="35%" cy="35%">
+        <stop offset="0%" stop-color="#e74c3c"/>
+        <stop offset="100%" stop-color="#922b21"/>
+      </radialGradient>
+      <radialGradient id="orangeGrad" cx="35%" cy="35%">
+        <stop offset="0%" stop-color="#f39c12"/>
+        <stop offset="100%" stop-color="#d35400"/>
+      </radialGradient>
+      <radialGradient id="purpleGrad" cx="35%" cy="35%">
+        <stop offset="0%" stop-color="#9b59b6"/>
+        <stop offset="100%" stop-color="#6c3483"/>
+      </radialGradient>
+      <radialGradient id="greenFrGrad" cx="35%" cy="35%">
+        <stop offset="0%" stop-color="#2ecc71"/>
+        <stop offset="100%" stop-color="#1e8449"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Ground -->
+    <rect x="0" y="502" width="900" height="20" fill="#0d1f0f" rx="4"/>
+    <!-- Grass tufts -->
+    <path d="M350 502 Q355 490 360 502" stroke="#3d7a35" stroke-width="2" fill="none"/>
+    <path d="M370 502 Q373 494 376 502" stroke="#2d5a27" stroke-width="2" fill="none"/>
+    <path d="M510 502 Q515 490 520 502" stroke="#3d7a35" stroke-width="2" fill="none"/>
+    <path d="M530 502 Q533 494 536 502" stroke="#2d5a27" stroke-width="2" fill="none"/>
+    <path d="M400 502 Q404 496 408 502" stroke="#4a8a3a" stroke-width="2" fill="none"/>
+    <path d="M480 502 Q484 495 488 502" stroke="#3d7a35" stroke-width="2" fill="none"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="logo-badge">
+      <span class="logo-dot"></span>
+      STARC Technologies · starc-solutions.tech
+    </div>
+    <h1>Tools that <span>Grow With You</span></h1>
+    <p class="tagline">AI tools built to save time — one fruit on the tree, every month.</p>
+
+    <div class="search-wrap">
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Search a tool, or ask anything…" id="searchInput"/>
+        <button class="search-btn" onclick="handleSearch()">Explore →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <span class="section-label">Who We Are</span>
+    <h2>A growing ecosystem of <em>smart AI tools</em> rooted in real purpose</h2>
+  </div>
+
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <p>STARC Technologies was founded with one simple belief — AI should save you time, not waste it. We build focused, powerful AI tools for real people with real work to do.</p>
+      <p>Like a tree that grows one strong branch at a time, we release one refined AI tool every month — each one a fruit of genuine craft and purpose.</p>
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-num">1</div>
+          <div class="stat-label">Tool / Month</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">3+</div>
+          <div class="stat-label">Active Tools</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">∞</div>
+          <div class="stat-label">Growing Vision</div>
+        </div>
+      </div>
     </div>
 
+    <div class="vision-card">
+      <h3>🌱 Our Roadmap</h3>
+      <p>Every new tool is a fruit on our tree. As we grow, the tree grows too.</p>
+      <div class="timeline">
+        <div class="tl-item"><span class="tl-dot"></span> Month 1 — Tool #1 launched ✓</div>
+        <div class="tl-item"><span class="tl-dot"></span> Month 2 — Tool #2 in progress</div>
+        <div class="tl-item"><span class="tl-dot dim"></span> Month 3 — Coming soon…</div>
+        <div class="tl-item"><span class="tl-dot dim"></span> Month 4 — The tree grows…</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="tools-header reveal">
+    <span class="section-label">Our Fruits</span>
+    <h2>AI Tools, Handcrafted Monthly</h2>
+    <p>Each tool is a carefully grown fruit — free to taste, premium to keep.</p>
+  </div>
+
+  <div class="tools-grid">
+    <div class="tool-card reveal">
+      <span class="tool-fruit">🍎</span>
+      <h3>Tool One</h3>
+      <p>Our first AI tool, designed to save you hours every week. Smart, fast, and built for real workflows.</p>
+      <span class="tool-badge badge-free">✦ Free Tier Available</span>
+      <a href="#" class="tool-btn">Try Free →</a>
+    </div>
+
+    <div class="tool-card reveal">
+      <span class="tool-fruit">🍊</span>
+      <h3>Tool Two</h3>
+      <p>The second fruit on our tree — automation that handles repetitive tasks so you don't have to.</p>
+      <span class="tool-badge badge-free">✦ Free Tier Available</span>
+      <a href="#" class="tool-btn">Try Free →</a>
+    </div>
+
+    <div class="tool-card reveal">
+      <span class="tool-fruit">🍇</span>
+      <h3>Tool Three</h3>
+      <p>Our newest addition — intelligent analysis that turns raw data into clear, actionable insight.</p>
+      <span class="tool-badge badge-free">✦ Free Tier Available</span>
+      <a href="#" class="tool-btn">Try Free →</a>
+    </div>
+
+    <div class="tool-card coming reveal">
+      <span class="tool-fruit">🌿</span>
+      <h3>Coming Next Month</h3>
+      <p>A new fruit is forming on the tree. Growing in the dark, ready to bloom in time.</p>
+      <span class="tool-badge badge-soon">◌ Growing…</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="reveal">
+    <span class="section-label">Plans</span>
+    <h2>Start Free. Grow When Ready.</h2>
+    <p class="sub">Freemium model — taste the fruit for free, go premium for the full harvest.</p>
+  </div>
+
+  <div class="price-grid reveal">
+    <div class="price-card">
+      <h3>🌱 Seed</h3>
+      <div class="price-amount">₹0 <small>/mo</small></div>
+      <p class="price-desc">Free forever. Get started with no card required.</p>
+      <ul class="price-features">
+        <li>Access to all tools (limited)</li>
+        <li>Watermarked exports</li>
+        <li>50 requests/month per tool</li>
+        <li>Community support</li>
+      </ul>
+      <a href="#tools" class="cta-btn cta-outline">Start Free →</a>
+    </div>
+
+    <div class="price-card featured">
+      <div class="featured-badge">MOST POPULAR</div>
+      <h3>🌳 Pro</h3>
+      <div class="price-amount"><sup>₹</sup>499 <small>/mo</small></div>
+      <p class="price-desc">Full access. No watermark. Unlimited potential.</p>
+      <ul class="price-features">
+        <li>Unlimited tool access</li>
+        <li>No watermarks on exports</li>
+        <li>Priority processing</li>
+        <li>Early access to new tools</li>
+        <li>Email support</li>
+      </ul>
+      <a href="#" class="cta-btn cta-green" onclick="handlePayment()">Subscribe via Razorpay →</a>
+    </div>
+  </div>
+  <p class="razorpay-note">🔒 Secure payments powered by Razorpay · Cancel anytime</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">STARC <span>Technologies</span></div>
+  <p>starc-solutions.tech · hello@starc-solutions.tech</p>
+  <p style="margin-top:24px">© 2025 STARC Technologies. All rights reserved.</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  setInterval(() => {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+  }, 16);
+
+  document.querySelectorAll('a, button, .tool-card, .menu-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px';
+      cursor.style.height = '20px';
+      cursor.style.background = '#b5c96a';
+      ring.style.width = '50px';
+      ring.style.height = '50px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px';
+      cursor.style.height = '12px';
+      cursor.style.background = '#8aad3f';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+    });
+  });
+
+  // Bird menu toggle
+  function toggleMenu() {
+    const menu = document.getElementById('birdMenu');
+    const overlay = document.getElementById('overlay');
+    const bird = document.getElementById('bird-btn');
+    menu.classList.toggle('open');
+    overlay.classList.toggle('show');
+    bird.classList.add('flap');
+    setTimeout(() => bird.classList.remove('flap'), 400);
+  }
+
+  // Search
+  function handleSearch() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (!q) return;
+    const lower = q.toLowerCase();
+    if (lower.includes('price') || lower.includes('plan') || lower.includes('cost')) {
+      document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+    } else if (lower.includes('tool') || lower.includes('ai') || lower.includes('app')) {
+      document.getElementById('tools').scrollIntoView({ behavior: 'smooth' });
+    } else if (lower.includes('about') || lower.includes('who') || lower.includes('vision')) {
+      document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+    } else {
+      document.getElementById('tools').scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSearch();
+  });
+
+  // Razorpay placeholder
+  function handlePayment() {
+    alert('Razorpay integration: Add your Key ID here.\n\nvar rzp = new Razorpay({ key: "YOUR_KEY_ID", amount: 49900, currency: "INR", name: "STARC Technologies", description: "Pro Plan" }); rzp.open();');
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
