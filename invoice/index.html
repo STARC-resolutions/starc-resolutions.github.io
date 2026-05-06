@@ -3,229 +3,227 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STARC Invoice — Smart GST Invoicing for India</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>STARC Invoice — Professional GST Invoicing for India</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a1a0c;
-  --dark: #0d1f0f;
-  --forest: #1e4a20;
-  --green: #2d5a27;
-  --olive: #6b7c3a;
-  --leaf: #8aad3f;
-  --light-leaf: #b5c96a;
-  --brown: #5c3d1e;
-  --bark: #7a4f2d;
-  --cream: #f5f0e8;
-  --gold: #c9a84c;
-  --red: #c0392b;
-  --muted: rgba(245,240,232,0.45);
+  --bg: #080f09;
+  --panel: #0c160e;
+  --green: #1e4a20;
+  --olive: #5a6b2e;
+  --leaf: #7fa832;
+  --light: #a8c44a;
+  --cream: #f2ede4;
+  --gold: #c4953a;
+  --muted: rgba(242,237,228,0.42);
+  --border: rgba(127,168,50,0.16);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; }
 body {
   background: var(--bg);
   color: var(--cream);
   font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
   overflow: hidden;
   position: relative;
 }
 
-/* Background */
-.bg-art {
+/* Ambient background */
+.ambient {
   position: fixed; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse at 20% 80%, rgba(45,90,39,0.25) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(107,124,58,0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(13,31,15,0.8) 0%, #0a1a0c 100%);
+    radial-gradient(ellipse 60% 50% at 20% 100%, rgba(30,74,32,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 0%, rgba(90,107,46,0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(8,15,9,0.9) 0%, #080f09 100%);
 }
 
-/* Floating leaves */
-.leaf { position:fixed; pointer-events:none; opacity:0.12; animation: leafFloat linear infinite; }
-@keyframes leafFloat {
-  0% { transform: translateY(110vh) rotate(0deg); opacity:0; }
-  10% { opacity:0.12; }
-  90% { opacity:0.08; }
-  100% { transform: translateY(-10vh) rotate(360deg); opacity:0; }
+/* Subtle grid */
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(127,168,50,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,50,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
 }
 
-.login-wrap {
+/* Floating particles */
+.particle {
+  position: fixed; border-radius: 50%;
+  background: radial-gradient(circle, rgba(127,168,50,0.6), transparent);
+  pointer-events: none; z-index: 0;
+  animation: drift linear infinite;
+}
+@keyframes drift {
+  0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(-20vh) translateX(30px) scale(1); opacity: 0; }
+}
+
+.wrap {
   position: relative; z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  padding: 20px;
-  animation: fadeUp 0.8s ease both;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 36px; padding: 24px;
+  animation: rise 0.9s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes rise {
+  from { opacity:0; transform: translateY(32px); }
+  to   { opacity:1; transform: translateY(0); }
 }
 
-.brand {
-  text-align: center;
+/* Brand */
+.brand { text-align: center; }
+.brand-mark {
+  display: inline-flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
 }
-
-.brand-icon {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 12px;
-  filter: drop-shadow(0 0 20px rgba(138,173,63,0.5));
-  animation: iconPulse 3s ease-in-out infinite;
-}
-
-@keyframes iconPulse {
-  0%,100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(138,173,63,0.5)); }
-  50% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(138,173,63,0.8)); }
-}
-
-.brand h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.8rem;
-  font-weight: 900;
-  letter-spacing: -1px;
-}
-.brand h1 span { color: var(--leaf); }
-.brand p {
-  color: var(--muted);
-  font-size: 14px;
-  margin-top: 6px;
-  letter-spacing: 0.5px;
-}
-
-.login-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(138,173,63,0.2);
-  border-radius: 24px;
-  padding: 44px 40px;
-  width: min(420px, 92vw);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 32px 64px rgba(0,0,0,0.5);
-}
-
-.login-card h2 {
-  font-family: 'Playfair Display', serif;
+.logo-ring {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(30,74,32,0.8), rgba(90,107,46,0.4));
+  border: 1px solid rgba(127,168,50,0.35);
+  display: flex; align-items: center; justify-content: center;
   font-size: 1.6rem;
-  margin-bottom: 6px;
+  box-shadow: 0 0 24px rgba(127,168,50,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+  animation: glow 3s ease-in-out infinite;
 }
-.login-card .sub {
-  color: var(--muted);
-  font-size: 13px;
-  margin-bottom: 32px;
-  line-height: 1.6;
+@keyframes glow {
+  0%,100% { box-shadow: 0 0 24px rgba(127,168,50,0.2), inset 0 1px 0 rgba(255,255,255,0.08); }
+  50%      { box-shadow: 0 0 40px rgba(127,168,50,0.4), inset 0 1px 0 rgba(255,255,255,0.08); }
+}
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem; font-weight: 900;
+  letter-spacing: -0.5px; line-height: 1;
+}
+.brand-name span { color: var(--leaf); }
+.brand-sub {
+  font-size: 11px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--muted);
+  margin-top: 4px;
+}
+.hero-line {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  line-height: 1.25; text-align: center;
+  max-width: 420px;
+}
+.hero-line em { font-style: italic; color: var(--leaf); }
+.hero-desc {
+  font-size: 13.5px; color: var(--muted);
+  text-align: center; line-height: 1.7;
+  max-width: 360px; margin-top: 8px;
+}
+
+/* Login card */
+.card {
+  background: rgba(255,255,255,0.028);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 38px 36px;
+  width: min(400px, 92vw);
+  backdrop-filter: blur(24px);
+  box-shadow:
+    0 0 0 1px rgba(127,168,50,0.06),
+    0 24px 64px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 .google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  padding: 15px 20px;
-  background: rgba(138,173,63,0.08);
-  border: 1px solid rgba(138,173,63,0.35);
-  border-radius: 14px;
-  color: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  gap: 11px; width: 100%; padding: 14px 20px;
+  background: rgba(127,168,50,0.07);
+  border: 1px solid rgba(127,168,50,0.3);
+  border-radius: 13px; color: var(--cream);
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s;
-  letter-spacing: 0.3px;
+  font-size: 14.5px; font-weight: 500;
+  cursor: pointer; transition: all 0.25s;
+  letter-spacing: 0.2px;
 }
 .google-btn:hover {
-  background: rgba(138,173,63,0.16);
+  background: rgba(127,168,50,0.14);
   border-color: var(--leaf);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.35);
 }
-.google-btn:active { transform: translateY(0); }
-
-.google-btn svg { flex-shrink: 0; }
 
 .divider {
   display: flex; align-items: center; gap: 12px;
-  margin: 24px 0;
-  color: var(--muted); font-size: 12px; letter-spacing: 1px;
+  margin: 22px 0; color: var(--muted);
+  font-size: 11px; letter-spacing: 2px;
 }
 .divider::before, .divider::after {
-  content: ''; flex: 1;
-  height: 1px; background: rgba(138,173,63,0.15);
+  content:''; flex:1; height:1px;
+  background: var(--border);
 }
 
-.features {
-  display: flex; flex-direction: column; gap: 12px;
-}
+.features { display: flex; flex-direction: column; gap: 11px; }
 .feat {
-  display: flex; align-items: center; gap: 12px;
-  font-size: 13px; color: var(--muted);
+  display: flex; align-items: flex-start; gap: 11px;
+  font-size: 13px; color: var(--muted); line-height: 1.5;
 }
-.feat-icon {
-  width: 32px; height: 32px;
-  background: rgba(138,173,63,0.1);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; flex-shrink: 0;
+.feat-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--leaf); flex-shrink: 0; margin-top: 5px;
+  box-shadow: 0 0 6px var(--leaf);
 }
 
-.free-badge {
-  text-align: center;
-  margin-top: 28px;
-  font-size: 12px;
-  color: var(--olive);
-  letter-spacing: 1px;
+.free-note {
+  text-align: center; margin-top: 22px;
+  font-size: 11.5px; color: rgba(242,237,228,0.28);
 }
-.free-badge strong { color: var(--leaf); }
+.free-note strong { color: var(--olive); }
 
-/* Loading state */
-.loading-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(10,26,12,0.9);
-  z-index: 100;
-  align-items: center; justify-content: center;
-  flex-direction: column; gap: 16px;
+/* Loader */
+.loader {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(8,15,9,0.92); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px;
 }
-.loading-overlay.show { display: flex; }
-.spinner {
-  width: 40px; height: 40px;
-  border: 3px solid rgba(138,173,63,0.2);
-  border-top-color: var(--leaf);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.loader.show { display: flex; }
+.spin {
+  width: 36px; height: 36px;
+  border: 2.5px solid rgba(127,168,50,0.2);
+  border-top-color: var(--leaf); border-radius: 50%;
+  animation: sp 0.75s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(20px); }
-  to { opacity:1; transform:translateY(0); }
-}
+@keyframes sp { to { transform: rotate(360deg); } }
+.loader p { font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
 
-<div class="bg-art"></div>
+<div class="ambient"></div>
+<div class="grid-bg"></div>
 
-<!-- Floating leaves -->
-<div class="leaf" style="left:10%;font-size:24px;animation-duration:12s;animation-delay:0s">🍃</div>
-<div class="leaf" style="left:25%;font-size:18px;animation-duration:15s;animation-delay:3s">🌿</div>
-<div class="leaf" style="left:60%;font-size:22px;animation-duration:11s;animation-delay:6s">🍃</div>
-<div class="leaf" style="left:80%;font-size:16px;animation-duration:14s;animation-delay:1s">🌿</div>
-<div class="leaf" style="left:45%;font-size:20px;animation-duration:13s;animation-delay:8s">🍃</div>
+<!-- Particles -->
+<div class="particle" style="left:8%;width:4px;height:4px;animation-duration:14s;animation-delay:0s"></div>
+<div class="particle" style="left:22%;width:3px;height:3px;animation-duration:18s;animation-delay:4s"></div>
+<div class="particle" style="left:55%;width:5px;height:5px;animation-duration:12s;animation-delay:7s"></div>
+<div class="particle" style="left:75%;width:3px;height:3px;animation-duration:16s;animation-delay:2s"></div>
+<div class="particle" style="left:88%;width:4px;height:4px;animation-duration:20s;animation-delay:10s"></div>
+<div class="particle" style="left:40%;width:3px;height:3px;animation-duration:15s;animation-delay:5s"></div>
 
-<div class="login-wrap">
+<div class="wrap">
   <div class="brand">
-    <span class="brand-icon">🌳</span>
-    <h1>STARC <span>Invoice</span></h1>
-    <p>Smart invoicing for Indian freelancers & businesses</p>
+    <div class="brand-mark">
+      <div class="logo-ring">🌿</div>
+      <div>
+        <div class="brand-name">STARC <span>Invoice</span></div>
+        <div class="brand-sub">by STARC Solutions</div>
+      </div>
+    </div>
+    <div class="hero-line">GST invoicing that <em>actually works</em> for Indian businesses</div>
+    <p class="hero-desc">Legally compliant TAX INVOICE — CGST, SGST, IGST auto-calculated. Professional PDF in one click.</p>
   </div>
 
-  <div class="login-card">
-    <h2>Welcome back 👋</h2>
-    <p class="sub">Sign in to create invoices, track payments and manage your clients — all in one place.</p>
-
-    <button class="google-btn" onclick="signInWithGoogle()">
-      <svg width="20" height="20" viewBox="0 0 24 24">
+  <div class="card">
+    <button class="google-btn" onclick="signInGoogle()">
+      <svg width="19" height="19" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -237,59 +235,55 @@ body {
     <div class="divider">WHAT YOU GET</div>
 
     <div class="features">
-      <div class="feat"><span class="feat-icon">🧾</span> Professional GST-ready invoices in seconds</div>
-      <div class="feat"><span class="feat-icon">📊</span> Dashboard — paid, pending & overdue at a glance</div>
-      <div class="feat"><span class="feat-icon">👥</span> Save clients, auto-fill next invoice</div>
-      <div class="feat"><span class="feat-icon">📄</span> Download PDF — share directly with clients</div>
+      <div class="feat"><span class="feat-dot"></span>Legally valid TAX INVOICE — CGST / SGST / IGST auto-split</div>
+      <div class="feat"><span class="feat-dot"></span>GSTIN format validation, HSN / SAC codes, Place of Supply</div>
+      <div class="feat"><span class="feat-dot"></span>Your logo, PAN, bank details, UPI QR on every PDF</div>
+      <div class="feat"><span class="feat-dot"></span>Save clients & items — reuse with one click</div>
+      <div class="feat"><span class="feat-dot"></span>WhatsApp reminder with invoice summary</div>
     </div>
 
-    <div class="free-badge">
-      <strong>5 invoices free</strong> · No credit card needed
+    <div class="free-note">
+      <strong>5 invoices free</strong> · No credit card · Cancel anytime
     </div>
   </div>
 </div>
 
-<div class="loading-overlay" id="loader">
-  <div class="spinner"></div>
-  <p style="color:var(--muted);font-size:14px">Signing you in…</p>
+<div class="loader" id="loader">
+  <div class="spin"></div>
+  <p>Signing you in…</p>
 </div>
 
-<!-- Firebase -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  // ── PASTE YOUR CONFIG HERE ──
-  const firebaseConfig = {
-    apiKey: "AIzaSyCjVZ3BUVVz3fD2fbK2vwo7ugA47e4ZCm4",
-    authDomain: "starc-invoice.firebaseapp.com",
-    projectId: "starc-invoice",
-    storageBucket: "starc-invoice.firebasestorage.app",
-    messagingSenderId: ""370202874783"",
-    appId: "1:370202874783:web:b2668e28ec24319178a3aa"
-  };
+/* ── PASTE YOUR FIREBASE CONFIG ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyCjVZ3BUVVz3fD2fbK2vwo7ugA47e4ZCm4",
+  authDomain:        "starc-invoice.firebaseapp.com",
+  projectId:         "starc-invoice",
+  storageBucket:     "starc-invoice.firebasestorage.app",
+  messagingSenderId:  "370202874783",
+  appId:              "1:370202874783:web:b2668e28ec24319178a3aa",
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+const app      = initializeApp(firebaseConfig);
+const auth     = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-  // If already logged in → go to app
-  onAuthStateChanged(auth, user => {
-    if (user) window.location.href = "app.html";
-  });
+onAuthStateChanged(auth, u => { if (u) location.href = 'app.html'; });
 
-  window.signInWithGoogle = async () => {
-    document.getElementById('loader').classList.add('show');
-    try {
-      await signInWithPopup(auth, provider);
-      // onAuthStateChanged will redirect
-    } catch (e) {
-      document.getElementById('loader').classList.remove('show');
-      alert("Sign-in failed. Please try again.");
-      console.error(e);
-    }
-  };
+window.signInGoogle = async () => {
+  document.getElementById('loader').classList.add('show');
+  try {
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    document.getElementById('loader').classList.remove('show');
+    alert('Sign-in failed. Please try again.');
+    console.error(e);
+  }
+};
 </script>
 </body>
 </html>
