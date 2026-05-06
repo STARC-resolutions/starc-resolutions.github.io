@@ -634,7 +634,7 @@ tbody tr:hover td{background:rgba(127,168,50,.02);}
             <div class="pd" id="plDsc">5 invoices free · Watermarked PDF</div>
             <div class="pu" id="plUs">0 / 5 used</div>
           </div>
-          <button class="btn bp" id="upgBtnS" onclick="openUpg()" style="width:100%;justify-content:center">🚀 Upgrade to Pro — ₹199/mo</button>
+          <button class="btn bp" id="upgBtnS" onclick="openUpg()" style="width:100%;justify-content:center">🚀 Upgrade to Pro — ₹99/mo</button>
         </div>
       </div>
     </div>
@@ -702,8 +702,8 @@ tbody tr:hover td{background:rgba(127,168,50,.02);}
     <h3>🌳 Upgrade to Pro</h3>
     <p style="color:var(--muted);font-size:12.5px">Everything you need to run a professional invoicing business.</p>
     <div class="plan-cards">
-      <div class="pc sel" id="pcM" onclick="selPl('m')"><h4>Monthly</h4><div class="pp">₹499</div><div class="ps">per month</div></div>
-      <div class="pc" id="pcY" onclick="selPl('y')"><h4>Yearly</h4><div class="pp">₹399<span style="font-size:.9rem">/mo</span></div><div class="ps">₹4,788/year · Save 20%</div></div>
+      <div class="pc sel" id="pcM" onclick="selPl('m')"><h4>Monthly</h4><div class="pp">₹99</div><div class="ps">per month</div></div>
+      <div class="pc" id="pcY" onclick="selPl('y')"><h4>Yearly</h4><div class="pp">₹79<span style="font-size:.9rem">/mo</span></div><div class="ps">₹948/year · Save 20%</div></div>
     </div>
     <ul class="pfl">
       <li>Unlimited invoices — no cap</li>
@@ -1687,8 +1687,8 @@ window.openUpg=()=>document.getElementById('upgMo').classList.add('on');
 window.closeUpg=()=>document.getElementById('upgMo').classList.remove('on');
 
 window.doRzp=()=>{
-  if(!RZP_KEY||RZP_KEY==='YOUR_RAZORPAY_KEY_ID'){ toast('⚠ Add your Razorpay Key ID in the code'); return; }
-  const amt=planSel==='m'?49900:478800;
+  if(!RZP_KEY||RZP_KEY==='rzp_live_Slajx7K1jJBgd3'){ toast('⚠ Add your Razorpay Key ID in the code'); return; }
+  const amt=planSel==='m'?9900:79900;
   const desc=planSel==='m'?'Pro Monthly':'Pro Yearly';
   try {
     new window.Razorpay({
