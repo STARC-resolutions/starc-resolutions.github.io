@@ -1451,20 +1451,27 @@ function buildPDF(inv){
   y+=9;
 
   pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(20,20,20);
-  inv.items.forEach((it,idx)=>{
-    const rowH=9;
-    if(idx%2===0){pdf.setFillColor(247,250,244);pdf.rect(M,y,RW,rowH,'F');}
-    const base=(it.qty||0)*(it.rate||0);
-    const tax=base*(it.gst||0)/100;
-    const cg=tax/2,sg=tax/2,ig=tax;
-    const tot=base+tax;
-    const row=inv.isInterState
-      ?[String(idx+1),it.desc?.substring(0,28)||'—',it.hsn||'—',fN(it.qty),it.unit||'NOS',fN(it.rate),fN(base),`${it.gst/2}% ₹${fN(ig)}`,fN(tot)]
-      :[String(idx+1),it.desc?.substring(0,22)||'—',it.hsn||'—',fN(it.qty),it.unit||'NOS',fN(it.rate),fN(base),`${it.gst/2}% ₹${fN(cg)}`,`${it.gst/2}% ₹${fN(sg)}`,fN(tot)];
-    row.forEach((v,i)=>pdf.text(v,cw[i]+1,y+5.8));
-    y+=rowH;
-  });
+  inv.items.forEach((it, idx) => {
+    const rowH = 12; // Extra vertical space to prevent character bleeding
+    if (idx % 2 === 0) { pdf.setFillColor(247, 250, 244); pdf.rect(M, y, RW, rowH, 'F'); }
+    
+    // Convert strings to floats to prevent &%#$$$ math errors
+    const q = parseFloat(it.qty || 0);
+    const r = parseFloat(it.rate || 0);
+    const g = parseFloat(it.gst || 0);
+    const base = q * r;
+    const taxAmt = base * (g / 100);
+    const total = base + taxAmt;
 
+    // formatting columns for clean alignment
+    const row = inv.isInterState
+      ? [String(idx + 1), it.desc?.substring(0, 22) || '—', it.hsn || '—', fN(q), it.unit || 'NOS', fN(r), fN(base), `${g}% ₹${fN(taxAmt)}`, fN(total)]
+      : [String(idx + 1), it.desc?.substring(0, 16) || '—', it.hsn || '—', fN(q), it.unit || 'NOS', fN(r), fN(base), `${g/2}% ₹${fN(taxAmt/2)}`, `${g/2}% ₹${fN(taxAmt/2)}`, fN(total)];
+
+    // Print values with center-row alignment
+    row.forEach((v, i) => pdf.text(String(v), cw[i] + 1, y + 7));
+    y += rowH;
+  });
   /* ── TOTALS ── */
   y+=5;
   const tX=M+RW*0.55;
