@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sentinel Invoice</title>
+<title>Ruby Invoice</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
@@ -1687,7 +1687,7 @@ window.openUpg=()=>document.getElementById('upgMo').classList.add('on');
 window.closeUpg=()=>document.getElementById('upgMo').classList.remove('on');
 
 window.doRzp=()=>{
-  if(!RZP_KEY||RZP_KEY==='rzp_live_Slajx7K1jJBgd3'){ toast('⚠ Paste your Razorpay Key ID in the code first'); return; }
+  if(!RZP_KEY||RZP_KEY==='YOUR_RAZORPAY_KEY_ID'){ toast('⚠ Paste your Razorpay Key ID in the code first'); return; }
   if(!window.Razorpay){ toast('⚠ Razorpay script not loaded. Check internet connection.'); return; }
   const amt=planSel==='m'?9900:79900;
   const desc=planSel==='m'?'Pro Monthly':'Pro Yearly';
