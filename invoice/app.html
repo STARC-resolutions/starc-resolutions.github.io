@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ruby Invoice</title>
+<title>Sentinel Invoice</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
@@ -305,7 +305,7 @@ tbody tr:hover td{background:rgba(127,168,50,.02);}
 <aside class="sidebar" id="sidebar">
   <div class="s-brand">
     <div class="ring">🌿</div>
-    <h2>Ruby Invoice<small>GST · India</small></h2>
+    <h2>Sentinel Invoice<small>GST · India</small></h2>
   </div>
   <div class="s-label">Invoice</div>
   <div class="nav on" onclick="go('dashboard')"><span class="ni">📊</span>Dashboard</div>
@@ -325,7 +325,7 @@ tbody tr:hover td{background:rgba(127,168,50,.02);}
     </div>
     <div class="pro-bar" id="proBnr">
       <p>🚀 Unlimited invoices, no watermark, logo + signature on PDF</p>
-      <button onclick="openUpg()">Upgrade — ₹99/mo</button>
+      <button onclick="openUpg()">Upgrade — ₹499/mo</button>
     </div>
     <div class="nav" onclick="doOut()" style="color:var(--muted)"><span class="ni">🚪</span>Sign Out</div>
   </div>
@@ -634,7 +634,7 @@ tbody tr:hover td{background:rgba(127,168,50,.02);}
             <div class="pd" id="plDsc">5 invoices free · Watermarked PDF</div>
             <div class="pu" id="plUs">0 / 5 used</div>
           </div>
-          <button class="btn bp" id="upgBtnS" onclick="openUpg()" style="width:100%;justify-content:center">🚀 Upgrade to Pro — ₹99/mo</button>
+          <button class="btn bp" id="upgBtnS" onclick="openUpg()" style="width:100%;justify-content:center">🚀 Upgrade to Pro — ₹499/mo</button>
         </div>
       </div>
     </div>
@@ -731,9 +731,6 @@ tbody tr:hover td{background:rgba(127,168,50,.02);}
 <div class="toast" id="toast"><span id="toastTxt"></span></div>
 <div class="lw" id="ldr"><div class="spin"></div><p id="ldrTxt">Loading…</p></div>
 
-<!-- ══════════════════════════════════════════════════════════
-     APP LOGIC
-══════════════════════════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -748,10 +745,10 @@ window.addEventListener('DOMContentLoaded', function() {
    ►  YOUR FIREBASE CONFIG
 ═══════════════════════════════════════ */
 const FB = {
-  apiKey:            "AIzaSyCjVZ3BUVVz3fD2fbK2vwo7ugA47e4ZCm4",
+  apiKey:             "AIzaSyCjVZ3BUVVz3fD2fbK2vwo7ugA47e4ZCm4",
   authDomain:        "starc-invoice.firebaseapp.com",
   projectId:         "starc-invoice",
-  storageBucket:     "starc-invoice.firebasestorage.app",
+  storageBucket:      "starc-invoice.firebasestorage.app",
   messagingSenderId:  "370202874783",
   appId:             "1:370202874783:web:b2668e28ec24319178a3aa",
 };
@@ -1176,13 +1173,13 @@ function renderItms(){
 
     return `<tr>
       <td style="min-width:180px">
-        <input type="text" value="${esc(it.desc)}" placeholder="Description…" oninput="ui(${i},'desc',this.value)"/>
+        <input type="text" value="${esc(it.desc)}" placeholder="Description…" oninput="items[${i}].desc=this.value;calcTotals()" onblur="renderItms()"/>
         ${catalog.length?`<select onchange="fillCatItm(${i},this.value)" style="margin-top:4px;font-size:11px"><option value="">📦 From catalog…</option>${catOpts}</select>`:''}
       </td>
-      <td><input type="text" value="${esc(it.hsn)}" placeholder="998314" maxlength="8" style="font-family:'JetBrains Mono',monospace;font-size:11.5px" oninput="ui(${i},'hsn',this.value)"/></td>
-      <td><input type="number" value="${it.qty}" min="0.01" step="0.01" style="text-align:center" oninput="ui(${i},'qty',+this.value)"/></td>
+      <td><input type="text" value="${esc(it.hsn)}" placeholder="998314" maxlength="8" style="font-family:'JetBrains Mono',monospace;font-size:11.5px" oninput="items[${i}].hsn=this.value"/></td>
+      <td><input type="number" value="${it.qty}" min="0.01" step="0.01" style="text-align:center" oninput="items[${i}].qty=+this.value;calcTotals()"/></td>
       <td><select onchange="ui(${i},'unit',this.value)">${UNITS.map(u=>`<option value="${u}" ${u===it.unit?'selected':''}>${u}</option>`).join('')}</select></td>
-      <td><input type="number" value="${it.rate}" min="0" step="0.01" oninput="ui(${i},'rate',+this.value)"/></td>
+      <td><input type="number" value="${it.rate}" min="0" step="0.01" oninput="items[${i}].rate=+this.value;calcTotals()"/></td>
       <td><select onchange="ui(${i},'gst',+this.value)">
         ${[0,5,12,18,28].map(g=>`<option value="${g}" ${g===it.gst?'selected':''}>${g}%</option>`).join('')}
       </select></td>
@@ -1195,7 +1192,13 @@ function renderItms(){
   calcTotals();
 }
 
-window.ui=(i,k,v)=>{items[i][k]=v; renderItms();};
+window.ui=(i,k,v)=>{
+  items[i][k]=v;
+  // Only re-render totals for numeric fields, not text fields
+  if(k==='qty'||k==='rate'||k==='gst') calcTotals();
+};
+// Full re-render only when needed (blur event)
+window.uiBlur=(i,k,v)=>{items[i][k]=v; renderItms();};
 window.addItm=()=>{items.push({desc:'',hsn:'',qty:1,unit:'NOS',rate:0,gst:parseInt(cfg.dgst||'18')});renderItms();};
 window.rmItm=i=>{if(items.length>1){items.splice(i,1);renderItms();}};
 
@@ -1385,179 +1388,227 @@ window.genPDF=()=>{
 function buildPDF(inv){
   const {jsPDF}=window.jspdf;
   const pdf=new jsPDF({unit:'mm',format:'a4'});
-  const W=210,M=15,RW=W-2*M; let y=14;
+  const W=210, M=14, CW=W-2*M;
+  let y=0;
 
-  /* ── HEADER ── */
-  pdf.setFillColor(22,52,24); pdf.rect(0,0,W,50,'F');
+  // ── HEADER BAR ──
+  pdf.setFillColor(22,52,24);
+  pdf.rect(0,0,W,42,'F');
 
-  // Logo
-  let logoH=false;
-  if(isPro&&cfg.logo){
-    try{ pdf.addImage(cfg.logo,'PNG',M,8,36,18); logoH=true; }catch(e){}
-  }
-  if(!logoH){
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(17); pdf.setTextColor(168,196,74);
-    pdf.text(inv.supName||'STARC Solutions',M,20);
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,195,120);
-    if(inv.supGstin) pdf.text(`GSTIN: ${inv.supGstin}`,M,27);
-    if(inv.supPan)   pdf.text(`PAN: ${inv.supPan}`,M,33);
-    if(inv.supPhone) pdf.text(inv.supPhone,M,39);
-    if(inv.supEmail) pdf.text(inv.supEmail,M,45);
+  // Company name / logo
+  if(isPro && cfg.logo){
+    try{ pdf.addImage(cfg.logo,'PNG',M,6,34,18); }
+    catch(e){
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.setTextColor(168,196,74);
+      pdf.text(inv.supName||'Sentinel Invoice',M,18);
+    }
   } else {
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,195,120);
-    if(inv.supGstin) pdf.text(`GSTIN: ${inv.supGstin}`,M,32);
-    if(inv.supPan)   pdf.text(`PAN: ${inv.supPan}`,M,38);
-    if(inv.supAddr){const al=pdf.splitTextToSize(inv.supAddr,70);pdf.text(al,M,44);}
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.setTextColor(168,196,74);
+    pdf.text(inv.supName||'Sentinel Invoice',M,18);
   }
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(160,190,120);
+  let yl=24;
+  if(inv.supGstin){ pdf.text('GSTIN: '+inv.supGstin,M,yl); yl+=5; }
+  if(inv.supPan)  { pdf.text('PAN: '+inv.supPan,M,yl); yl+=5; }
+  if(inv.supAddr) { pdf.text(inv.supAddr.split('\n').join(' ').substring(0,50),M,yl); }
 
-  // TAX INVOICE label (mandatory)
-  pdf.setFont('helvetica','bold'); pdf.setFontSize(15); pdf.setTextColor(242,237,228);
-  pdf.text('TAX INVOICE',W-M,18,{align:'right'});
-  pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor(168,196,74);
-  pdf.text(`Invoice No: ${inv.number}`,W-M,26,{align:'right'});
-  pdf.text(`Date: ${inv.date}`,W-M,32,{align:'right'});
-  pdf.text(`Due: ${inv.dueDate}`,W-M,38,{align:'right'});
-  const posState=STATES.find(s=>s.code===inv.placeOfSupply);
-  if(posState) pdf.text(`Place of Supply: ${posState.name}`,W-M,44,{align:'right'});
-  pdf.text(`Supply Type: ${inv.supplyType||'B2B'} | RC: ${inv.reverseCharge==='Y'?'Yes':'No'}`,W-M,49,{align:'right'});
+  // TAX INVOICE label — right side
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(14); pdf.setTextColor(255,255,255);
+  pdf.text('TAX INVOICE',W-M,14,{align:'right'});
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(168,196,74);
+  pdf.text('No: '+inv.number,W-M,21,{align:'right'});
+  pdf.text('Date: '+inv.date,W-M,27,{align:'right'});
+  pdf.text('Due: '+inv.dueDate,W-M,33,{align:'right'});
+  const posNm = STATES.find(s=>s.code===inv.placeOfSupply)?.name||inv.placeOfSupply||'';
+  if(posNm) pdf.text('POS: '+posNm,W-M,39,{align:'right'});
 
-  y=60;
+  y=48;
 
-  /* ── BILL TO / FROM ── */
-  pdf.setFillColor(235,240,230); pdf.rect(M,y,RW/2-2,28,'F');
-  pdf.setFillColor(240,244,236); pdf.rect(M+RW/2+2,y,RW/2-2,28,'F');
-  y+=6;
-  pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(90,107,46);
-  pdf.text('BILL TO',M+3,y); pdf.text('SUPPLIER',M+RW/2+5,y); y+=5;
+  // ── BILL TO / SUPPLIER ──
+  pdf.setFillColor(240,245,235);
+  pdf.rect(M,y,CW/2-3,32,'F');
+  pdf.rect(M+CW/2+3,y,CW/2-3,32,'F');
+
+  // Bill To
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(7); pdf.setTextColor(80,110,60);
+  pdf.text('BILL TO',M+3,y+6);
   pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(20,30,20);
-  pdf.text(inv.custName||'—',M+3,y); pdf.text(inv.supName||'—',M+RW/2+5,y); y+=5;
-  pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(55,65,50);
-  if(inv.custGstin) pdf.text(`GSTIN: ${inv.custGstin}`,M+3,y);
-  if(inv.supGstin&&logoH) pdf.text(`GSTIN: ${inv.supGstin}`,M+RW/2+5,y);
-  y+=4;
-  if(inv.custAddr){const cl=pdf.splitTextToSize(inv.custAddr,75);pdf.text(cl,M+3,y);}
-  y+=10;
+  pdf.text((inv.custName||'').substring(0,30),M+3,y+13);
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(60,75,55);
+  let cy=y+19;
+  if(inv.custGstin){ pdf.text('GSTIN: '+inv.custGstin,M+3,cy); cy+=5; }
+  if(inv.custAddr){
+    const lines=pdf.splitTextToSize(inv.custAddr,CW/2-10);
+    lines.slice(0,2).forEach(l=>{ pdf.text(l,M+3,cy); cy+=4; });
+  }
+  if(inv.custPhone) pdf.text(inv.custPhone,M+3,cy);
 
-  /* ── ITEMS TABLE ── */
-  y+=4;
-  const cols=[M,M+52,M+70,M+80,M+92,M+108,M+119,M+138,M+158,M+176];
-  pdf.setFillColor(22,52,24); pdf.rect(M,y,RW,8,'F');
+  // Supplier
+  const sx=M+CW/2+6;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(7); pdf.setTextColor(80,110,60);
+  pdf.text('SUPPLIER',sx,y+6);
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(20,30,20);
+  pdf.text((inv.supName||'').substring(0,30),sx,y+13);
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(60,75,55);
+  let sy2=y+19;
+  if(inv.supGstin){ pdf.text('GSTIN: '+inv.supGstin,sx,sy2); sy2+=5; }
+  if(inv.supPan)  { pdf.text('PAN: '+inv.supPan,sx,sy2); sy2+=5; }
+  const stNm=STATES.find(s=>s.code===inv.supState)?.name||'';
+  if(stNm) pdf.text(stNm,sx,sy2);
+
+  y+=38;
+
+  // Supply info row
+  pdf.setFillColor(230,240,220);
+  pdf.rect(M,y,CW,7,'F');
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(60,80,50);
+  pdf.text('Supply Type: '+(inv.supplyType||'B2B'),M+3,y+5);
+  pdf.text('Reverse Charge: '+(inv.reverseCharge==='Y'?'Yes':'No'),M+50,y+5);
+  pdf.text('Tax Type: '+(inv.isInterState?'IGST (Interstate)':'CGST+SGST (Intrastate)'),M+100,y+5);
+  y+=12;
+
+  // ── ITEMS TABLE ──
+  const isIG=inv.isInterState;
+  // Column widths
+  const cols = isIG
+    ? {x:[M,M+6,M+52,M+80,M+92,M+104,M+124,M+148,M+172], w:[6,46,28,12,12,20,24,24,24]}
+    : {x:[M,M+6,M+48,M+76,M+88,M+100,M+116,M+138,M+158,M+178], w:[6,42,28,12,12,16,22,22,22,18]};
+  const hdrs = isIG
+    ? ['#','DESCRIPTION','HSN/SAC','QTY','UNIT','TAXABLE','IGST','TOTAL']
+    : ['#','DESCRIPTION','HSN/SAC','QTY','UNIT','TAXABLE','CGST','SGST','TOTAL'];
+
+  // Header
+  pdf.setFillColor(22,52,24);
+  pdf.rect(M,y,CW,8,'F');
   pdf.setFont('helvetica','bold'); pdf.setFontSize(6.5); pdf.setTextColor(168,196,74);
-  const hdrs=inv.isInterState
-    ?['#','DESCRIPTION','HSN/SAC','QTY','UNIT','RATE','TAXABLE','IGST','TOTAL']
-    :['#','DESCRIPTION','HSN/SAC','QTY','UNIT','RATE','TAXABLE','CGST','SGST','TOTAL'];
-  const cw = inv.isInterState 
-    ? [M, M+8, M+52, M+72, M+88, M+98, M+118, M+142, M+166] 
-    : [M, M+8, M+48, M+68, M+80, M+90, M+105, M+125, M+145, M+165];
-  hdrs.forEach((h,i)=>pdf.text(h,cw[i]+1,y+5.5));
+  hdrs.forEach((h,i)=>pdf.text(h,cols.x[i]+1,y+5.5));
   y+=9;
 
-  pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor(20,20,20);
-  inv.items.forEach((it, idx) => {
-    const rowH = 12; // Increased to 12mm to stop text-bleeding
-    if (idx % 2 === 0) { pdf.setFillColor(247, 250, 244); pdf.rect(M, y, RW, rowH, 'F'); }
-    
-    // Explicit numeric math to prevent the &%#$$$ errors
-    const q = parseFloat(it.qty || 0);
-    const r = parseFloat(it.rate || 0);
-    const g = parseFloat(it.gst || 0);
-    const b = q * r;
-    const t = b * (g / 100);
-    const total = b + t;
-
-    const row = inv.isInterState
-      ? [String(idx + 1), it.desc?.substring(0, 20) || '—', it.hsn || '—', fN(q), it.unit || 'NOS', fN(r), fN(b), `${g}% ₹${fN(t)}`, fN(total)]
-      : [String(idx + 1), it.desc?.substring(0, 16) || '—', it.hsn || '—', fN(q), it.unit || 'NOS', fN(r), fN(b), `${g/2}% ₹${fN(t/2)}`, `${g/2}% ₹${fN(t/2)}`, fN(total)];
-
-    row.forEach((val, i) => pdf.text(String(val), cw[i] + 1, y + 7));
-    y += rowH;
+  // Rows
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(20,25,20);
+  inv.items.forEach((it,idx)=>{
+    const rh=9;
+    if(idx%2===0){ pdf.setFillColor(247,251,243); pdf.rect(M,y,CW,rh,'F'); }
+    const base=(it.qty||0)*(it.rate||0);
+    const tax=base*(it.gst||0)/100;
+    if(isIG){
+      const row=[String(idx+1),
+        (it.desc||'').substring(0,26),
+        it.hsn||'',
+        String(+(it.qty||0).toFixed(2)),
+        it.unit||'NOS',
+        fN(base),
+        (it.gst||0)+'% '+fN(tax),
+        fN(base+tax)
+      ];
+      row.forEach((v,i)=>{ pdf.text(String(v),cols.x[i]+1,y+6); });
+    } else {
+      const row=[String(idx+1),
+        (it.desc||'').substring(0,22),
+        it.hsn||'',
+        String(+(it.qty||0).toFixed(2)),
+        it.unit||'NOS',
+        fN(base),
+        (it.gst/2)+'% '+fN(tax/2),
+        (it.gst/2)+'% '+fN(tax/2),
+        fN(base+tax)
+      ];
+      row.forEach((v,i)=>{ pdf.text(String(v),cols.x[i]+1,y+6); });
+    }
+    y+=rh;
   });
-    
-  /* ── TOTALS ── */
-  y+=5;
-  const tX=M+RW*0.55;
-  pdf.setDrawColor(160,180,140); pdf.setLineWidth(0.2);
+
+  y+=6;
+
+  // ── TOTALS ──
+  const tX=M+CW*0.55;
+  const tW=W-M-tX;
+  pdf.setDrawColor(180,210,160); pdf.setLineWidth(0.3);
   pdf.line(tX,y,W-M,y); y+=5;
 
-  const rows = [
-    ['Taxable Amount', fN(inv.taxable)],
-    ...(inv.isInterState ? [['IGST', fN(inv.igst)]] : [['CGST', fN(inv.cgst)], ['SGST', fN(inv.sgst)]]),
+  const totRows=[
+    ['Taxable Amount', fN(inv.taxable||0)],
+    ...(isIG
+      ? [['IGST ('+( (inv.items||[]).map(i=>i.gst).filter((v,i,a)=>a.indexOf(v)===i).join('+')||'0')+'%)', fN(inv.igst||0)]]
+      : [['CGST', fN(inv.cgst||0)],['SGST', fN(inv.sgst||0)]]
+    )
   ];
-  
-  pdf.setFontSize(8.5); 
-  rows.forEach(([label, value]) => {
-    pdf.text(label, tX, y); 
-    pdf.text(`₹${value}`, W - M, y, { align: 'right' }); 
-    y += 8; // Extra vertical gap
+
+  pdf.setFontSize(8.5); pdf.setFont('helvetica','normal');
+  totRows.forEach(([l,v])=>{
+    pdf.setTextColor(70,80,65);
+    pdf.text(l,tX+2,y);
+    pdf.setTextColor(20,30,20);
+    pdf.text(v,W-M-2,y,{align:'right'});
+    y+=6;
   });
 
-  y += 2;
-  pdf.setFillColor(22, 52, 24); 
-  pdf.rect(tX - 5, y - 5, (W - M - tX) + 10, 12, 'F'); // Wider box for grand total
-  pdf.setFont('helvetica', 'bold'); 
-  pdf.setTextColor(255, 255, 255);
-  pdf.text('TOTAL AMOUNT:', tX, y + 3);
-  pdf.text(`₹${fN(inv.grandTotal)}`, W - M, y + 3, { align: 'right' });
-  y+=14;
+  pdf.line(tX,y,W-M,y); y+=2;
+  pdf.setFillColor(22,52,24);
+  pdf.rect(tX,y,W-M-tX,11,'F');
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(9.5); pdf.setTextColor(255,255,255);
+  pdf.text('TOTAL',tX+3,y+7.5);
+  pdf.text(fN(inv.grandTotal||0),W-M-2,y+7.5,{align:'right'});
+  y+=17;
 
-  /* Amount in words */
-  pdf.setFont('helvetica','italic'); pdf.setFontSize(7.5); pdf.setTextColor(80,80,80);
-  pdf.text(`Amount in Words: ${numToWords(Math.round(inv.grandTotal))} Rupees Only`,M,y);
+  // Amount in words
+  pdf.setFont('helvetica','italic'); pdf.setFontSize(7.5); pdf.setTextColor(70,90,60);
+  pdf.text('Amount in Words: '+numToWords(Math.round(inv.grandTotal||0))+' Rupees Only',M,y);
   y+=8;
 
-  /* Notes */
+  // ── NOTES / BANK DETAILS ──
   if(inv.notes){
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(90,107,46);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(80,110,60);
     pdf.text('BANK & PAYMENT DETAILS',M,y); y+=5;
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(50,60,50);
-    const nl=pdf.splitTextToSize(inv.notes,RW*0.55);
-    pdf.text(nl,M,y);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(50,65,45);
+    const nl=pdf.splitTextToSize(inv.notes,CW*0.55);
+    nl.forEach(l=>{ pdf.text(l,M,y); y+=4.5; });
   }
 
-  /* UPI QR (Pro) */
-  if(isPro&&cfg.upi){
-    try {
+  // ── UPI QR (Pro) ──
+  if(isPro && cfg.upi){
+    try{
       const wrap=document.createElement('div');
-      wrap.style.cssText='position:fixed;left:-9999px;background:white;padding:5px';
+      wrap.style.cssText='position:fixed;left:-9999px;background:white;padding:4px';
       document.body.appendChild(wrap);
-      new QRCode(wrap,{text:`upi://pay?pa=${cfg.upi}&pn=${encodeURIComponent(cfg.biz||'')}&cu=INR`,width:80,height:80,colorDark:'#1e4a20',colorLight:'#ffffff'});
+      new QRCode(wrap,{text:'upi://pay?pa='+cfg.upi+'&pn='+encodeURIComponent(cfg.biz||'')+'&cu=INR',width:72,height:72,colorDark:'#163414',colorLight:'#ffffff'});
       setTimeout(()=>{
         const img=wrap.querySelector('img');
         if(img){
-          const qrY=y-4;
-          pdf.addImage(img.src,'PNG',W-M-28,qrY,24,24);
-          pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(80,80,80);
-          pdf.text('Scan to Pay',W-M-22,qrY+26,{align:'center'});
-          pdf.text(`UPI: ${cfg.upi}`,W-M-22,qrY+30,{align:'center'});
+          const qy=250; const qx=W-M-28;
+          pdf.addImage(img.src,'PNG',qx,qy,24,24);
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(6.5); pdf.setTextColor(80,100,70);
+          pdf.text('Scan to Pay',qx+12,qy+26,{align:'center'});
         }
         document.body.removeChild(wrap);
-      },600);
-    } catch(e){}
+      },500);
+    }catch(e){}
   }
 
-  /* Signature (Pro) */
-  if(isPro&&cfg.sig){
-    try {
-      const sigY=255;
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(90,107,46);
-      pdf.text('For '+(inv.supName||'STARC Solutions'),W-M-48,sigY);
-      pdf.addImage(cfg.sig,'PNG',W-M-48,sigY+2,44,16);
-      pdf.line(W-M-48,sigY+20,W-M,sigY+20);
-      pdf.text('Authorised Signatory',W-M-48,sigY+24);
-    } catch(e){}
+  // ── SIGNATURE (Pro) ──
+  if(isPro && cfg.sig){
+    try{
+      const sigX=W-M-52; const sigY=252;
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(80,100,70);
+      pdf.text('For '+(inv.supName||'').substring(0,25),sigX,sigY);
+      pdf.addImage(cfg.sig,'PNG',sigX,sigY+2,46,16);
+      pdf.setDrawColor(150,170,130); pdf.line(sigX,sigY+20,W-M,sigY+20);
+      pdf.text('Authorised Signatory',sigX,sigY+24);
+    }catch(e){}
   }
 
-  /* Footer */
-  pdf.setFillColor(235,242,230); pdf.rect(0,286,W,11,'F');
-  pdf.setFontSize(6.8); pdf.setTextColor(90,107,46); pdf.setFont('helvetica','normal');
+  // ── FOOTER ──
+  pdf.setFillColor(232,242,224);
+  pdf.rect(0,285,W,12,'F');
+  pdf.setFontSize(7); pdf.setTextColor(80,110,60); pdf.setFont('helvetica','normal');
   if(!isPro){
-    pdf.text('Generated by Ruby Invoice · invoice.starc-solutions.tech · Upgrade to Pro to remove this watermark',W/2,293,{align:'center'});
+    pdf.text('Generated free by Sentinel Invoice | invoice.starc-solutions.tech | Upgrade to Pro to remove this watermark',W/2,292,{align:'center'});
   } else {
-    pdf.text(`${inv.supName||'STARC Solutions'} · This is a computer generated invoice · Powered by Ruby Invoice · invoice.starc-solutions.tech`,W/2,293,{align:'center'});
+    pdf.text((inv.supName||'Sentinel Invoice')+' | invoice.starc-solutions.tech | This is a computer generated TAX INVOICE',W/2,292,{align:'center'});
   }
 
-  pdf.save(`${inv.number}_${(inv.custName||'invoice').replace(/\s+/g,'_')}.pdf`);
-  toast('⬇ PDF downloaded!');
+  pdf.save((inv.number||'invoice')+'_'+(inv.custName||'customer').replace(/\s+/g,'_')+'.pdf');
+  toast('PDF downloaded!');
 }
 
 /* ══════════════════════════════════════
@@ -1699,7 +1750,7 @@ window.openUpg=()=>document.getElementById('upgMo').classList.add('on');
 window.closeUpg=()=>document.getElementById('upgMo').classList.remove('on');
 
 window.doRzp=()=>{
-  if(!RZP_KEY||RZP_KEY==="YOUR_RAZORPAY_KEY_ID"){ toast('⚠ Paste your Razorpay Key ID in the code first'); return; }
+  if(!RZP_KEY||RZP_KEY==='YOUR_RAZORPAY_KEY_ID'){ toast('⚠ Paste your Razorpay Key ID in the code first'); return; }
   if(!window.Razorpay){ toast('⚠ Razorpay script not loaded. Check internet connection.'); return; }
   const amt=planSel==='m'?9900:79900;
   const desc=planSel==='m'?'Pro Monthly':'Pro Yearly';
@@ -1767,18 +1818,24 @@ function numToWords(n){
 function fmt(n){ return '₹'+fN(n); }
 function fN(n){
   const num = Number(n||0);
+  // Simple 2 decimal, no locale — safe for jsPDF
   const fixed = num.toFixed(2);
   const parts = fixed.split('.');
-  let intPart = parts[0];
+  let x = parts[0];
   const dec = parts[1];
-  // Indian number system: last 3 digits, then groups of 2
-  if(intPart.length > 3){
-    const last3 = intPart.slice(-3);
-    const rest = intPart.slice(0,-3);
-    intPart = rest.replace(/\B(?=(\d{2})+(?!\d))/g,',') + ',' + last3;
+  // Indian grouping: last 3, then groups of 2
+  if(x.length > 3){
+    const last3 = x.slice(-3);
+    let rest = x.slice(0,-3);
+    let grouped = '';
+    while(rest.length > 2){ grouped = ',' + rest.slice(-2) + grouped; rest = rest.slice(0,-2); }
+    grouped = rest + grouped;
+    x = grouped + ',' + last3;
   }
-  return intPart + '.' + dec;
+  return x + '.' + dec;
 }
+// PDF safe number — no rupee symbol, plain ASCII only
+function pdfN(n){ return 'Rs.' + fN(n); }
 function H(id,html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
 function V(id,val){ const el=document.getElementById(id); if(el) el.value=val; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -2072,10 +2129,10 @@ window.prevInv = id => {
         <div class="pt-row grand"><span>Total Payable</span><span>₹${fN(inv.grandTotal||0)}</span></div>
       </div>
     </div>
-    ${inv.notes?`<div class="prev-notes"><strong>Bank & Payment Details:</strong><br>${inv.notes.split('\n').join('<br>')}</div>`:''}
+    ${inv.notes?`<div class="prev-notes"><strong>Bank & Payment Details:</strong><br>${inv.notes.split('\n').join(' ')}</div>`:''}
     <div class="prev-words"><em>Amount in Words: ${numToWords(Math.round(inv.grandTotal||0))} Rupees Only</em></div>
     ${watermark}
-    <div class="prev-foot">This is a computer generated TAX INVOICE · Ruby Invoice · invoice.starc-solutions.tech</div>
+    <div class="prev-foot">This is a computer generated TAX INVOICE · Sentinel Invoice · invoice.starc-solutions.tech</div>
     <div class="prev-actions">
       <button class="btn bg bsm" onclick="document.getElementById('prevMo').classList.remove('on')">✕ Close</button>
       <button class="btn bg bsm" onclick="editInv('${inv.id}');document.getElementById('prevMo').classList.remove('on')">✏️ Edit</button>
@@ -2108,7 +2165,5 @@ function genInvNo(){
 }
 
 </script>
-
-
 </body>
 </html>
