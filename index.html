@@ -832,7 +832,7 @@
   <a href="#about" class="menu-item" onclick="toggleMenu()">
     <span class="menu-icon">🌿</span> Our Story
   </a>
-  <a href="#tools" class="menu-item" onclick="toggleMenu()">
+  <a href="#tools" class="menu-item" onclick="toggleMenu();return true;">
     <span class="menu-icon">🍎</span> AI Tools
   </a>
   <a href="#pricing" class="menu-item" onclick="toggleMenu()">
@@ -1037,8 +1037,8 @@
           <div class="stat-label">Tool / Month</div>
         </div>
         <div class="stat">
-          <div class="stat-num">3+</div>
-          <div class="stat-label">Active Tools</div>
+          <div class="stat-num">1</div>
+          <div class="stat-label">Active Tool</div>
         </div>
         <div class="stat">
           <div class="stat-num">∞</div>
@@ -1051,7 +1051,7 @@
       <h3>🌱 Our Roadmap</h3>
       <p>Every new tool is a fruit on our tree. As we grow, the tree grows too.</p>
       <div class="timeline">
-        <div class="tl-item"><span class="tl-dot"></span> Month 1 — Tool #1 launched ✓</div>
+        <div class="tl-item"><span class="tl-dot"></span> Month 1 — Sentinel Invoice launched ✓</div>
         <div class="tl-item"><span class="tl-dot"></span> Month 2 — Tool #2 in progress</div>
         <div class="tl-item"><span class="tl-dot dim"></span> Month 3 — Coming soon…</div>
         <div class="tl-item"><span class="tl-dot dim"></span> Month 4 — The tree grows…</div>
@@ -1071,26 +1071,24 @@
   <div class="tools-grid">
     <div class="tool-card reveal">
       <span class="tool-fruit">🍎</span>
-      <h3>Ruby</h3>
-      <p>The premier GST-ready invoice engine. Precision-engineered for our hardworking indians.</p>
+      <h3>Sentinel Invoice</h3>
+      <p>India's smartest GST invoicing tool — legally compliant TAX INVOICE, CGST/SGST/IGST auto-calculated, professional PDF in one click.</p>
       <span class="tool-badge badge-free">✦ Free Tier Available</span>
-      <a href="/invoice/index.html" class="tool-btn">Try Free →</a>
+      <a href="https://invoice.starc-solutions.tech" class="tool-btn" target="_blank">Try Free →</a>
     </div>
 
-    <div class="tool-card reveal">
+    <div class="tool-card coming reveal">
       <span class="tool-fruit">🍊</span>
       <h3>Tool Two</h3>
-      <p>The second fruit on our tree — coming soon to boost your work.</p>
-      <span class="tool-badge badge-free">✦ Free Tier Available soon</span>
-      <a href="#" class="tool-btn">Coming Soon</a>
+      <p>The second fruit is growing. Coming soon — another tool built to save your time.</p>
+      <span class="tool-badge badge-soon">◌ Coming Soon</span>
     </div>
 
-    <div class="tool-card reveal">
+    <div class="tool-card coming reveal">
       <span class="tool-fruit">🍇</span>
       <h3>Tool Three</h3>
-      <p>Our next tool will taste you exactly like sweet grapes.</p>
-      <span class="tool-badge badge-free">✦ Free Tier Available soon</span>
-      <a href="#" class="tool-btn">Coming soon</a>
+      <p>Third fruit forming on the tree. Growing in the dark, ready to bloom.</p>
+      <span class="tool-badge badge-soon">◌ Coming Soon</span>
     </div>
 
     <div class="tool-card coming reveal">
@@ -1121,7 +1119,7 @@
         <li>50 requests/month per tool</li>
         <li>Community support</li>
       </ul>
-      <a href="/invoice/index.html" class="cta-btn cta-outline">Start Free →</a>
+      <a href="https://invoice.starc-solutions.tech" class="cta-btn cta-outline" target="_blank">Start Free →</a>
     </div>
 
     <div class="price-card featured">
@@ -1136,8 +1134,8 @@
         <li>Early access to new tools</li>
         <li>Email support</li>
       </ul>
-  <a href="javascript:void(0)" class="cta-btn cta-green" onclick="doRzp()">Subscribe via Razorpay →</a>
-</div>
+      <a href="#" class="cta-btn cta-green" onclick="handlePayment()">Subscribe via Razorpay →</a>
+    </div>
   </div>
   <p class="razorpay-note">🔒 Secure payments powered by Razorpay · Cancel anytime</p>
 </section>
@@ -1216,9 +1214,9 @@
     if (e.key === 'Enter') handleSearch();
   });
 
-  // Razorpay placeholder
+  // Razorpay — redirect to Sentinel Invoice upgrade
   function handlePayment() {
-    alert('Razorpay integration: "rzp_live_Slajx7K1jJBgd3".\n\nvar rzp = new Razorpay({ key: "YOUR_RAZORPAY_KEY_ID", amount: 9900, currency: "INR", name: "STARC Technologies", description: "Pro Plan" }); rzp.open();');
+    window.open('https://invoice.starc-solutions.tech', '_blank');
   }
 
   // Scroll reveal
